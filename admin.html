@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админ-панель - Milana Pet HOUSE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .drag-over {
+      border-color: #3b82f6;
+      background-color: #eff6ff;
+    }
+    
+    .preview-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+    
+    .preview-item {
+      position: relative;
+      aspect-ratio: 1;
+      overflow: hidden;
+      border-radius: 0.5rem;
+    }
+    
+    .preview-item img,
+    .preview-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  
+  <!-- Форма входа -->
+  <div id="loginForm" class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+      <h1 class="text-2xl font-bold text-center mb-6">Вход в админ-панель</h1>
+      <form onsubmit="login(event)">
+        <input type="email" id="email" placeholder="Email" required
+               class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4">
+        <input type="password" id="password" placeholder="Пароль" required
+               class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <button type="submit" 
+                class="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
+          Войти
+        </button>
+      </form>
+      <p id="errorMsg" class="text-red-500 text-sm mt-3 text-center hidden"></p>
+    </div>
+  </div>
+  
+  <!-- Админ-панель (остается такой же) -->
+  <div id="adminPanel" class="hidden">
+    <!-- Шапка -->
+    <header class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-800">Админ-панель Milana Pet HOUSE</h1>
+        <div class="flex items-center space-x-4">
+          <span id="userEmail" class="text-gray-600"></span>
+          <button onclick="logout()" class="text-gray-600 hover:text-gray-800">Выйти</button>
+        </div>
+      </div>
+    </header>
+    
+    <div class="max-w-7xl mx-auto p-4">
+      <!-- Табы -->
+      <div class="bg-white rounded-lg shadow mb-6">
+        <div class="border-b flex">
+          <button onclick="showTab('add')" id="tabAdd" 
+                  class="px-6 py-3 font-semibold text-blue-600 border-b-2 border-blue-600">
+            Добавить питомца
+          </button>
+          <button onclick="showTab('list')" id="tabList"
+                  class="px-6 py-3 font-semibold text-gray-600 hover:text-gray-800">
+            Все питомцы
+          </button>
+        </div>
+      </div>
+      
+      <!-- Форма добавления -->
+      <div id="addTab" class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-bold mb-6">Добавить нового питомца</h2>
+        
+        <form id="petForm" onsubmit="savePet(event)">
+          <!-- Загрузка медиа -->
+          <div class="mb-6">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              Фото и видео (до 5 файлов)
+            </label>
+            <div id="dropZone" 
+                 class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 transition"
+                 ondrop="handleDrop(event)" 
+                 ondragover="handleDragOver(event)"
+                 ondragleave="handleDragLeave(event)">
+              <svg class="w-12 h-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+              </svg>
+              <p class="text-gray-600 mb-2">Перетащите файлы сюда или нажмите для выбора</p>
+              <p class="text-sm text-gray-500">Поддерживаются: JPG, PNG, MP4 (до 50 МБ)</p>
+              <input type="file" id="fileInput" multiple accept="image/*,video/*" 
+                     class="hidden" onchange="handleFileSelect(event)">
+            </div>
+            
+            <!-- Превью загруженных файлов -->
+            <div id="mediaPreview" class="preview-container mt-4"></div>
+          </div>
+          
+          <!-- Основная информация -->
+          <div class="grid md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Тип животного</label>
+              <select id="petType" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                <option value="">Выберите тип</option>
+                <option value="dog">Собака</option>
+                <option value="cat">Кошка</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Порода</label>
+              <input type="text" id="breed" placeholder="Например: Йоркширский терьер" 
+                     class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Пол</label>
+              <select id="gender" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                <option value="">Выберите пол</option>
+                <option value="male">Мальчик</option>
+                <option value="female">Девочка</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Возраст (месяцев)</label>
+              <input type="number" id="age" min="1" max="120" placeholder="3" 
+                     class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Цена (₴)</label>
+              <input type="number" id="price" min="0" step="100" placeholder="10000" 
+                     class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Статус</label>
+              <select id="status" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="available">Доступен</option>
+                <option value="reserved">Забронирован</option>
+                <option value="sold">Продан</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Кнопка сохранения -->
+          <button type="submit" 
+                  class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
+            Добавить питомца
+          </button>
+        </form>
+      </div>
+      
+      <!-- Список питомцев -->
+      <div id="listTab" class="hidden">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-xl font-bold mb-6">Все питомцы</h2>
+          <div id="petsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Здесь будут карточки питомцев -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Firebase конфигурация с Authentication -->
+  <script type="module">
+    // Импорт Firebase
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getDatabase, ref, push, set, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+    
+    // Ваша конфигурация Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyAKcZ7Oi0DDpTweaM5aPDuY0MU97UAcYFk",
+      authDomain: "mph-com-ua.firebaseapp.com",
+      databaseURL: "https://mph-com-ua-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "mph-com-ua",
+      storageBucket: "mph-com-ua.firebasestorage.app",
+      messagingSenderId: "165948585505",
+      appId: "1:165948585505:web:3508790f07d1082a17a93a",
+      measurementId: "G-TVD7CXRCFP"
+    };
+    
+    // Инициализация Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+    const storage = getStorage(app);
+    
+    // Делаем функции глобальными
+    window.auth = auth;
+    window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+    window.signOut = signOut;
+    window.database = database;
+    window.storage = storage;
+    window.storageRef = storageRef;
+    window.uploadBytes = uploadBytes;
+    window.getDownloadURL = getDownloadURL;
+    window.dbRef = ref;
+    window.dbPush = push;
+    window.dbSet = set;
+    window.dbOnValue = onValue;
+    window.dbRemove = remove;
+    
+    // Проверка авторизации
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Пользователь авторизован
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('adminPanel').classList.remove('hidden');
+        document.getElementById('userEmail').textContent = user.email;
+        loadPets();
+      } else {
+        // Пользователь не авторизован
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('adminPanel').classList.add('hidden');
+      }
+    });
+  </script>
+  
+  <script>
+    let uploadedFiles = [];
+    
+    // Функция входа
+    async function login(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorMsg = document.getElementById('errorMsg');
+      
+      try {
+        await window.signInWithEmailAndPassword(window.auth, email, password);
+        errorMsg.classList.add('hidden');
+      } catch (error) {
+        console.error('Ошибка входа:', error);
+        errorMsg.textContent = 'Неверный email или пароль';
+        errorMsg.classList.remove('hidden');
+      }
+    }
+    
+    // Функция выхода
+    async function logout() {
+      try {
+        await window.signOut(window.auth);
+      } catch (error) {
+        console.error('Ошибка выхода:', error);
+      }
+    }
+    
+    // Переключение табов
+    function showTab(tab) {
+      if (tab === 'add') {
+        document.getElementById('addTab').classList.remove('hidden');
+        document.getElementById('listTab').classList.add('hidden');
+        document.getElementById('tabAdd').classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+        document.getElementById('tabAdd').classList.remove('text-gray-600');
+        document.getElementById('tabList').classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+        document.getElementById('tabList').classList.add('text-gray-600');
+      } else {
+        document.getElementById('addTab').classList.add('hidden');
+        document.getElementById('listTab').classList.remove('hidden');
+        document.getElementById('tabList').classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+        document.getElementById('tabList').classList.remove('text-gray-600');
+        document.getElementById('tabAdd').classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+        document.getElementById('tabAdd').classList.add('text-gray-600');
+        loadPets();
+      }
+    }
+    
+    // Обработка загрузки файлов
+    document.getElementById('dropZone').onclick = () => document.getElementById('fileInput').click();
+    
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.currentTarget.classList.add('drag-over');
+    }
+    
+    function handleDragLeave(e) {
+      e.currentTarget.classList.remove('drag-over');
+    }
+    
+    function handleDrop(e) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-over');
+      handleFiles(e.dataTransfer.files);
+    }
+    
+    function handleFileSelect(e) {
+      handleFiles(e.target.files);
+    }
+    
+    function handleFiles(files) {
+      const maxFiles = 5;
+      const maxSize = 50 * 1024 * 1024; // 50MB
+      
+      if (uploadedFiles.length + files.length > maxFiles) {
+        alert(`Можно загрузить максимум ${maxFiles} файлов`);
+        return;
+      }
+      
+      Array.from(files).forEach(file => {
+        if (file.size > maxSize) {
+          alert(`Файл ${file.name} слишком большой. Максимум 50 МБ.`);
+          return;
+        }
+        
+        if (!file.type.match(/^(image|video)\//)) {
+          alert(`Файл ${file.name} не является изображением или видео`);
+          return;
+        }
+        
+        uploadedFiles.push(file);
+        displayPreview(file);
+      });
+    }
+    
+    function displayPreview(file) {
+      const reader = new FileReader();
+      const preview = document.getElementById('mediaPreview');
+      
+      reader.onload = (e) => {
+        const div = document.createElement('div');
+        div.className = 'preview-item relative';
+        
+        if (file.type.startsWith('image/')) {
+          div.innerHTML = `
+            <img src="${e.target.result}" alt="Preview">
+            <button onclick="removeFile(${uploadedFiles.length - 1})" 
+                    class="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full hover:bg-red-600">
+              ✕
+            </button>
+          `;
+        } else {
+          div.innerHTML = `
+            <video src="${e.target.result}" controls></video>
+            <button onclick="removeFile(${uploadedFiles.length - 1})" 
+                    class="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full hover:bg-red-600">
+              ✕
+            </button>
+          `;
+        }
+        
+        preview.appendChild(div);
+      };
+      
+      reader.readAsDataURL(file);
+    }
+    
+    function removeFile(index) {
+      uploadedFiles.splice(index, 1);
+      updatePreview();
+    }
+    
+    function updatePreview() {
+      const preview = document.getElementById('mediaPreview');
+      preview.innerHTML = '';
+      uploadedFiles.forEach(file => displayPreview(file));
+    }
+    
+    // Сохранение питомца
+    async function savePet(e) {
+      e.preventDefault();
+      
+      // Проверка авторизации
+      if (!window.auth.currentUser) {
+        alert('Необходимо авторизоваться');
+        return;
+      }
+      
+      if (uploadedFiles.length === 0) {
+        alert('Пожалуйста, загрузите хотя бы одно фото или видео');
+        return;
+      }
+      
+      const petData = {
+        type: document.getElementById('petType').value,
+        breed: document.getElementById('breed').value,
+        gender: document.getElementById('gender').value,
+        age: parseInt(document.getElementById('age').value),
+        price: parseInt(document.getElementById('price').value),
+        status: document.getElementById('status').value,
+        createdAt: Date.now(),
+        createdBy: window.auth.currentUser.email,
+        media: []
+      };
+      
+      // Показываем индикатор загрузки
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Загрузка...';
+      submitBtn.disabled = true;
+      
+      try {
+        // Загружаем файлы в Firebase Storage
+        for (let i = 0; i < uploadedFiles.length; i++) {
+          const file = uploadedFiles[i];
+          const fileName = `pets/${Date.now()}_${file.name}`;
+          const fileRef = window.storageRef(window.storage, fileName);
+          
+          const snapshot = await window.uploadBytes(fileRef, file);
+          const downloadURL = await window.getDownloadURL(snapshot.ref);
+          
+          petData.media.push({
+            url: downloadURL,
+            type: file.type.startsWith('video/') ? 'video' : 'image'
+          });
+          
+          submitBtn.textContent = `Загрузка... ${i + 1}/${uploadedFiles.length}`;
+        }
+        
+        // Сохраняем данные в базу
+        const petsRef = window.dbRef(window.database, 'pets');
+        await window.dbPush(petsRef, petData);
+        
+        // Очищаем форму
+        document.getElementById('petForm').reset();
+        uploadedFiles = [];
+        document.getElementById('mediaPreview').innerHTML = '';
+        
+        alert('Питомец успешно добавлен!');
+        
+      } catch (error) {
+        console.error('Ошибка при сохранении:', error);
+        alert('Произошла ошибка: ' + error.message);
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+    }
+    
+    // Загрузка списка питомцев
+    function loadPets() {
+      const petsRef = window.dbRef(window.database, 'pets');
+      window.dbOnValue(petsRef, (snapshot) => {
+        const petsList = document.getElementById('petsList');
+        petsList.innerHTML = '';
+        
+        const pets = snapshot.val();
+        if (!pets) {
+          petsList.innerHTML = '<p class="text-gray-500 text-center col-span-full">Нет добавленных питомцев</p>';
+          return;
+        }
+        
+        Object.entries(pets).forEach(([id, pet]) => {
+          const card = createPetCard(id, pet);
+          petsList.appendChild(card);
+        });
+      });
+    }
+    
+    // Создание карточки питомца
+    function createPetCard(id, pet) {
+      const div = document.createElement('div');
+      div.className = 'bg-gray-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition';
+      
+      const mainMedia = pet.media && pet.media[0] ? pet.media[0] : null;
+      const mediaHtml = mainMedia 
+        ? mainMedia.type === 'video' 
+          ? `<video src="${mainMedia.url}" class="w-full h-48 object-cover" controls></video>`
+          : `<img src="${mainMedia.url}" alt="${pet.breed}" class="w-full h-48 object-cover">`
+        : '<div class="w-full h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400">Нет фото</span></div>';
+      
+      const statusColors = {
+        available: 'bg-green-100 text-green-800',
+        reserved: 'bg-yellow-100 text-yellow-800',
+        sold: 'bg-gray-100 text-gray-800'
+      };
+      
+      const statusTexts = {
+        available: 'Доступен',
+        reserved: 'Забронирован',
+        sold: 'Продан'
+      };
+      
+      div.innerHTML = `
+        ${mediaHtml}
+        <div class="p-4">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="font-semibold text-lg">${pet.breed}</h3>
+            <span class="text-xs px-2 py-1 rounded-full ${statusColors[pet.status]}">
+              ${statusTexts[pet.status]}
+            </span>
+          </div>
+          <p class="text-sm text-gray-600 mb-1">
+            ${pet.gender === 'male' ? '♂ Мальчик' : '♀ Девочка'}, ${pet.age} мес.
+          </p>
+          <p class="text-lg font-bold text-blue-600 mb-3">${pet.price.toLocaleString()} ₴</p>
+          <div class="flex gap-2">
+            <button onclick="editPet('${id}')" 
+                    class="flex-1 bg-blue-100 text-blue-700 py-2 rounded hover:bg-blue-200 transition text-sm">
+              Редактировать
+            </button>
+            <button onclick="deletePet('${id}')" 
+                    class="flex-1 bg-red-100 text-red-700 py-2 rounded hover:bg-red-200 transition text-sm">
+              Удалить
+            </button>
+          </div>
+        </div>
+      `;
+      
+      return div;
+    }
+    
+    // Удаление питомца
+    function deletePet(id) {
+      if (!window.auth.currentUser) {
+        alert('Необходимо авторизоваться');
+        return;
+      }
+      
+      if (confirm('Вы уверены, что хотите удалить этого питомца?')) {
+        const petRef = window.dbRef(window.database, `pets/${id}`);
+        window.dbRemove(petRef);
+      }
+    }
+    
+    // Редактирование питомца (заглушка)
+    function editPet(id) {
+      alert('Функция редактирования будет добавлена в следующей версии');
+    }
+  </script>
+</body>
+</html>
