@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Наши питомцы - Milana Pet House</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Навигация -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <img src="/images/logo.png" alt="Milana Pet House" class="h-10 w-10 mr-3">
+                        <span class="font-bold text-xl text-purple-600">Milana Pet House</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="/" class="text-gray-700 hover:text-purple-600 transition">Главная</a>
+                    <a href="/care.html" class="text-gray-700 hover:text-purple-600 transition">Уход</a>
+                    <a href="/reviews.html" class="text-gray-700 hover:text-purple-600 transition">Отзывы</a>
+                    <a href="/faq.html" class="text-gray-700 hover:text-purple-600 transition">FAQ</a>
+                </div>
+                
+                <!-- Мобильное меню -->
+                <div class="md:hidden">
+                    <button id="mobileMenuBtn" class="text-gray-700">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Мобильное меню (скрыто по умолчанию) -->
+    <div id="mobileMenu" class="hidden fixed top-16 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-40 md:hidden">
+        <div class="px-4 py-3 space-y-3 max-h-[calc(100vh-4rem)] overflow-y-auto">
+            <a href="/" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Главная</a>
+            <a href="/catalog.html" class="block text-purple-600 font-semibold py-2">Каталог</a>
+            <a href="/care.html" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Уход</a>
+            <a href="/reviews.html" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Отзывы</a>
+            <a href="/faq.html" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">FAQ</a>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Заголовок и фильтры -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Наши питомцы</h1>
+            
+            <!-- Панель фильтров -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Поиск -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Поиск по породе</label>
+                        <input type="text" id="searchInput" placeholder="Например: Лабрадор" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                    
+                    <!-- Тип питомца -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Тип питомца</label>
+                        <select id="typeFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option value="all">Все питомцы</option>
+                            <option value="dog">Собаки</option>
+                            <option value="cat">Кошки</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Диапазон цен -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Цена (грн)</label>
+                        <div class="flex space-x-2">
+                            <input type="number" id="minPrice" placeholder="От" 
+                                   class="w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <input type="number" id="maxPrice" placeholder="До" 
+                                   class="w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+                    
+                    <!-- Кнопка сброса -->
+                    <div class="flex items-end">
+                        <button id="resetFilters" class="w-full bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                            <i class="fas fa-undo mr-2"></i>Сбросить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Статус загрузки -->
+        <div id="loadingStatus" class="text-center py-8">
+            <div class="inline-flex items-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mr-3"></div>
+                <span class="text-gray-600">Загружаем питомцев...</span>
+            </div>
+        </div>
+
+        <!-- Сообщение, если нет питомцев -->
+        <div id="emptyMessage" class="hidden text-center py-12">
+            <i class="fas fa-paw text-6xl text-gray-300 mb-4"></i>
+            <p class="text-xl text-gray-500">Питомцы не найдены</p>
+            <p class="text-gray-400 mt-2">Попробуйте изменить параметры поиска</p>
+        </div>
+
+        <!-- Сетка с карточками питомцев -->
+        <div id="petsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Карточки будут добавлены через JavaScript -->
+        </div>
+    </main>
+
+    <!-- Подвал -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p>&copy; 2025 Milana Pet House. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+
+        // Конфигурация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAKcZ7Oi0DDpTweaM5aPDuY0MU97UAcYFk",
+            authDomain: "mph-com-ua.firebaseapp.com",
+            databaseURL: "https://mph-com-ua-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "mph-com-ua",
+            storageBucket: "mph-com-ua.firebasestorage.app",
+            messagingSenderId: "165948585505",
+            appId: "1:165948585505:web:3508790f07d1082a17a93a"
+        };
+
+        // Инициализация
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Глобальные переменные
+        let allPets = [];
+        let filteredPets = [];
+
+        // Элементы DOM
+        const petsGrid = document.getElementById('petsGrid');
+        const loadingStatus = document.getElementById('loadingStatus');
+        const emptyMessage = document.getElementById('emptyMessage');
+        const searchInput = document.getElementById('searchInput');
+        const typeFilter = document.getElementById('typeFilter');
+        const minPriceInput = document.getElementById('minPrice');
+        const maxPriceInput = document.getElementById('maxPrice');
+        const resetButton = document.getElementById('resetFilters');
+
+        // Загрузка питомцев из Firebase
+        function loadPets() {
+            console.log('Начинаем загрузку питомцев...');
+            const petsRef = ref(database, 'pets');
+            
+            onValue(petsRef, (snapshot) => {
+                const data = snapshot.val();
+                console.log('Получены данные из Firebase:', data);
+                allPets = [];
+                
+                if (data) {
+                    // Преобразуем объект в массив
+                    for (const [id, pet] of Object.entries(data)) {
+                        allPets.push({
+                            id: id,
+                            ...pet
+                        });
+                    }
+                    console.log('Загружено питомцев:', allPets.length);
+                    console.log('Данные питомцев:', allPets);
+                } else {
+                    console.log('В базе данных нет питомцев');
+                }
+                
+                // Скрываем загрузку
+                loadingStatus.classList.add('hidden');
+                
+                // Применяем фильтры и отображаем
+                applyFilters();
+            }, (error) => {
+                console.error('Ошибка загрузки данных:', error);
+                loadingStatus.innerHTML = '<p class="text-red-500">Ошибка загрузки данных. Попробуйте обновить страницу.</p>';
+            });
+        }
+
+        // Отображение питомцев
+        function displayPets(pets) {
+            petsGrid.innerHTML = '';
+            
+            if (pets.length === 0) {
+                petsGrid.classList.add('hidden');
+                emptyMessage.classList.remove('hidden');
+                return;
+            }
+            
+            petsGrid.classList.remove('hidden');
+            emptyMessage.classList.add('hidden');
+            
+            pets.forEach(pet => {
+                const card = createPetCard(pet);
+                petsGrid.appendChild(card);
+            });
+        }
+
+        // Создание карточки питомца
+        function createPetCard(pet) {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer';
+            
+            // Берем первое фото или заглушку
+            let imageUrl = '/images/pet-placeholder.jpg';
+            
+            if (pet.media && pet.media.length > 0 && pet.media[0].url) {
+                imageUrl = pet.media[0].url;
+            } else if (pet.images && pet.images.length > 0) {
+                imageUrl = pet.images[0];
+            }
+            
+            // Определяем пол для отображения
+            const genderText = pet.gender === 'male' ? 'Мальчик' : 'Девочка';
+            const genderIcon = pet.gender === 'male' ? 'mars' : 'venus';
+            
+            card.innerHTML = `
+                <div class="relative h-64 overflow-hidden">
+                    <img src="${imageUrl}" alt="${pet.breed}" 
+                         class="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                         onerror="this.src='/images/pet-placeholder.jpg'">
+                    <div class="absolute top-4 right-4 bg-white px-3 py-1 rounded-full shadow-md">
+                        <span class="text-sm font-semibold text-purple-600">
+                            ${pet.type === 'dog' ? '🐕 Собака' : '🐱 Кошка'}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">${pet.breed}</h3>
+                    
+                    <div class="space-y-2 mb-4">
+                        <p class="text-gray-600 flex items-center">
+                            <i class="fas fa-${genderIcon} mr-2 text-purple-500"></i>
+                            ${genderText}
+                        </p>
+                        <p class="text-gray-600 flex items-center">
+                            <i class="fas fa-birthday-cake mr-2 text-purple-500"></i>
+                            ${pet.age} ${getAgeWord(pet.age)}
+                        </p>
+                        <p class="text-2xl font-bold text-purple-600">
+                            ${pet.price.toLocaleString('ru-RU')} ₴
+                        </p>
+                    </div>
+                    
+                    <button onclick="window.location.href='/pet-details.html?id=${pet.id}'" 
+                            class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition font-semibold">
+                        Подробнее
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Склонение слова "месяц"
+        function getAgeWord(age) {
+            if (age % 10 === 1 && age % 100 !== 11) return 'месяц';
+            if ([2, 3, 4].includes(age % 10) && ![12, 13, 14].includes(age % 100)) return 'месяца';
+            return 'месяцев';
+        }
+
+        // Применение фильтров
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedType = typeFilter.value;
+            const minPrice = parseFloat(minPriceInput.value) || 0;
+            const maxPrice = parseFloat(maxPriceInput.value) || Infinity;
+            
+            filteredPets = allPets.filter(pet => {
+                // Поиск по породе
+                if (searchTerm && !pet.breed.toLowerCase().includes(searchTerm)) {
+                    return false;
+                }
+                
+                // Фильтр по типу
+                if (selectedType !== 'all' && pet.type !== selectedType) {
+                    return false;
+                }
+                
+                // Фильтр по цене
+                if (pet.price < minPrice || pet.price > maxPrice) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            displayPets(filteredPets);
+        }
+
+        // Сброс фильтров
+        function resetFilters() {
+            searchInput.value = '';
+            typeFilter.value = 'all';
+            minPriceInput.value = '';
+            maxPriceInput.value = '';
+            applyFilters();
+        }
+
+        // Обработчики событий
+        searchInput.addEventListener('input', applyFilters);
+        typeFilter.addEventListener('change', applyFilters);
+        minPriceInput.addEventListener('input', applyFilters);
+        maxPriceInput.addEventListener('input', applyFilters);
+        resetButton.addEventListener('click', resetFilters);
+
+        // Загружаем питомцев при старте
+        loadPets();
+        
+        // Мобильное меню
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    </script>
+</body>
+</html>

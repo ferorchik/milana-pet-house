@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детали питомца - Milana Pet House</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Навигация (такая же как в каталоге) -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <img src="/images/logo.png" alt="Milana Pet House" class="h-10 w-10 mr-3">
+                        <span class="font-bold text-xl text-purple-600">Milana Pet House</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="/" class="text-gray-700 hover:text-purple-600 transition">Главная</a>
+                    <a href="/catalog.html" class="text-gray-700 hover:text-purple-600 transition">Каталог</a>
+                    <a href="/care.html" class="text-gray-700 hover:text-purple-600 transition">Уход</a>
+                    <a href="/reviews.html" class="text-gray-700 hover:text-purple-600 transition">Отзывы</a>
+                    <a href="/faq.html" class="text-gray-700 hover:text-purple-600 transition">FAQ</a>
+                </div>
+                
+                <div class="md:hidden">
+                    <button id="mobileMenuBtn" class="text-gray-700">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Мобильное меню -->
+    <div id="mobileMenu" class="hidden fixed top-16 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-40 md:hidden">
+        <div class="px-4 py-3 space-y-3">
+            <a href="/" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Главная</a>
+            <a href="/catalog.html" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Каталог</a>
+            <a href="/care.html" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Уход</a>
+            <a href="/reviews.html" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Отзывы</a>
+            <a href="/faq.html" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">FAQ</a>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Хлебные крошки -->
+        <nav class="mb-6">
+            <ol class="flex items-center space-x-2 text-sm">
+                <li><a href="/" class="text-gray-500 hover:text-purple-600">Главная</a></li>
+                <li><span class="text-gray-400">/</span></li>
+                <li><a href="/catalog.html" class="text-gray-500 hover:text-purple-600">Каталог</a></li>
+                <li><span class="text-gray-400">/</span></li>
+                <li id="breadcrumbName" class="text-gray-700">Загрузка...</li>
+            </ol>
+        </nav>
+
+        <!-- Контент загрузки -->
+        <div id="loadingContent" class="text-center py-12">
+            <div class="inline-flex items-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mr-3"></div>
+                <span class="text-gray-600">Загружаем информацию о питомце...</span>
+            </div>
+        </div>
+
+        <!-- Контент питомца (скрыт по умолчанию) -->
+        <div id="petContent" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Галерея изображений -->
+                <div>
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                        <div id="mainImageContainer" class="aspect-square bg-gray-200">
+                            <img id="mainImage" src="/images/pet-placeholder.jpg" alt="Фото питомца" class="w-full h-full object-cover">
+                        </div>
+                        <div id="thumbnails" class="flex gap-2 p-4 overflow-x-auto">
+                            <!-- Миниатюры будут добавлены через JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Информация о питомце -->
+                <div>
+                    <h1 id="petBreed" class="text-3xl font-bold text-gray-800 mb-4">Порода</h1>
+                    
+                    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <p class="text-gray-500 text-sm">Тип</p>
+                                <p id="petType" class="font-semibold text-lg">-</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Пол</p>
+                                <p id="petGender" class="font-semibold text-lg">-</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Возраст</p>
+                                <p id="petAge" class="font-semibold text-lg">-</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Статус</p>
+                                <p id="petStatus" class="font-semibold text-lg text-green-600">Доступен</p>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t pt-4">
+                            <p class="text-3xl font-bold text-purple-600" id="petPrice">0 ₴</p>
+                        </div>
+                    </div>
+
+                    <!-- Описание (если есть) -->
+                    <div id="descriptionSection" class="bg-white rounded-lg shadow-lg p-6 mb-6 hidden">
+                        <h2 class="text-xl font-semibold mb-3">Описание</h2>
+                        <p id="petDescription" class="text-gray-700"></p>
+                    </div>
+
+                    <!-- Кнопки действий -->
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button onclick="openContactModal()" class="flex-1 bg-purple-600 text-white py-4 px-6 rounded-lg hover:bg-purple-700 transition font-semibold text-lg">
+                            <i class="fas fa-phone mr-2"></i>Связаться
+                        </button>
+                        <button onclick="window.location.href='/catalog.html'" class="flex-1 bg-gray-200 text-gray-700 py-4 px-6 rounded-lg hover:bg-gray-300 transition font-semibold text-lg">
+                            Вернуться к каталогу
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сообщение об ошибке -->
+        <div id="errorMessage" class="hidden text-center py-12">
+            <i class="fas fa-exclamation-circle text-6xl text-red-400 mb-4"></i>
+            <p class="text-xl text-gray-600">Питомец не найден</p>
+            <a href="/catalog.html" class="inline-block mt-4 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition">
+                Вернуться к каталогу
+            </a>
+        </div>
+    </main>
+
+    <!-- Модальное окно контактов (копируем из index.html) -->
+    <div id="contactModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-8 relative">
+            <button onclick="closeContactModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            
+            <h3 class="text-2xl font-bold text-slate-800 mb-6">Свяжитесь с нами</h3>
+            
+            <div class="space-y-4">
+                <a href="tel:+380632618179" class="flex items-center p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition">
+                    <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                        <i class="fas fa-phone text-white"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-slate-800">Позвонить</p>
+                        <p class="text-sm text-slate-600">+38 063 261 81 79</p>
+                    </div>
+                </a>
+                
+                <a href="viber://chat?number=+380632618179" class="flex items-center p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition">
+                    <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-white font-bold">V</span>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-slate-800">Viber</p>
+                        <p class="text-sm text-slate-600">Написать в Viber</p>
+                    </div>
+                </a>
+                
+                <a href="https://t.me/milana_pet_house" class="flex items-center p-4 bg-sky-50 rounded-xl hover:bg-sky-100 transition">
+                    <div class="w-12 h-12 bg-sky-500 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-white font-bold">T</span>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-slate-800">Telegram</p>
+                        <p class="text-sm text-slate-600">@milana_pet_house</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подвал -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p>&copy; 2025 Milana Pet House. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <!-- Firebase и JavaScript -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+
+        // Конфигурация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAKcZ7Oi0DDpTweaM5aPDuY0MU97UAcYFk",
+            authDomain: "mph-com-ua.firebaseapp.com",
+            databaseURL: "https://mph-com-ua-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "mph-com-ua",
+            storageBucket: "mph-com-ua.firebasestorage.app",
+            messagingSenderId: "165948585505",
+            appId: "1:165948585505:web:3508790f07d1082a17a93a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Получаем ID питомца из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const petId = urlParams.get('id');
+
+        if (!petId) {
+            showError();
+        } else {
+            loadPetDetails(petId);
+        }
+
+        async function loadPetDetails(id) {
+            try {
+                const petRef = ref(database, `pets/${id}`);
+                const snapshot = await get(petRef);
+                
+                if (snapshot.exists()) {
+                    const pet = snapshot.val();
+                    displayPetDetails(pet);
+                } else {
+                    showError();
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                showError();
+            }
+        }
+
+        function displayPetDetails(pet) {
+            // Скрываем загрузку, показываем контент
+            document.getElementById('loadingContent').classList.add('hidden');
+            document.getElementById('petContent').classList.remove('hidden');
+            
+            // Заполняем данные
+            document.getElementById('breadcrumbName').textContent = pet.breed;
+            document.getElementById('petBreed').textContent = pet.breed;
+            document.getElementById('petType').textContent = pet.type === 'dog' ? '🐕 Собака' : '🐱 Кошка';
+            document.getElementById('petGender').textContent = pet.gender === 'male' ? '♂ Мальчик' : '♀ Девочка';
+            document.getElementById('petAge').textContent = `${pet.age} ${getAgeWord(pet.age)}`;
+            document.getElementById('petPrice').textContent = `${pet.price.toLocaleString('ru-RU')} ₴`;
+            
+            // Описание (если есть)
+            if (pet.description) {
+                document.getElementById('descriptionSection').classList.remove('hidden');
+                document.getElementById('petDescription').textContent = pet.description;
+            }
+            
+            // Изображения
+            const images = pet.media || pet.images || [];
+            if (images.length > 0) {
+                const mainImage = document.getElementById('mainImage');
+                const firstImage = typeof images[0] === 'string' ? images[0] : images[0].url;
+                mainImage.src = firstImage;
+                
+                // Создаем миниатюры
+                const thumbnailsContainer = document.getElementById('thumbnails');
+                images.forEach((img, index) => {
+                    const imgUrl = typeof img === 'string' ? img : img.url;
+                    const thumb = document.createElement('img');
+                    thumb.src = imgUrl;
+                    thumb.alt = `Фото ${index + 1}`;
+                    thumb.className = 'w-20 h-20 object-cover rounded cursor-pointer hover:opacity-75 transition';
+                    thumb.onclick = () => {
+                        mainImage.src = imgUrl;
+                    };
+                    thumbnailsContainer.appendChild(thumb);
+                });
+            }
+            
+            // Обновляем заголовок страницы
+            document.title = `${pet.breed} - Milana Pet House`;
+        }
+
+        function showError() {
+            document.getElementById('loadingContent').classList.add('hidden');
+            document.getElementById('errorMessage').classList.remove('hidden');
+        }
+
+        function getAgeWord(age) {
+            if (age % 10 === 1 && age % 100 !== 11) return 'месяц';
+            if ([2, 3, 4].includes(age % 10) && ![12, 13, 14].includes(age % 100)) return 'месяца';
+            return 'месяцев';
+        }
+
+        // Функции для модального окна
+        window.openContactModal = function() {
+            document.getElementById('contactModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        window.closeContactModal = function() {
+            document.getElementById('contactModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Мобильное меню
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    </script>
+</body>
+</html>
