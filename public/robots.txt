@@ -1,0 +1,27 @@
+# Robots.txt для mph.com.ua
+# Создан: 2025
+
+User-agent: *
+Allow: /
+Disallow: /admin-secure.html
+Disallow: /admin/
+Disallow: /*.json$
+
+# Sitemap
+Sitemap: https://mph.com.ua/sitemap.xml
+
+# Crawl-delay для вежливого краулинга
+Crawl-delay: 1
+
+# Специальные правила для основных ботов
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Yandexbot
+Allow: /
+Crawl-delay: 1

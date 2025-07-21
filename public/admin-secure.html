@@ -30,9 +30,47 @@
       height: 100%;
       object-fit: cover;
     }
+    
+    .upload-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(0,0,0,0.2);
+    }
+    
+    .upload-progress-bar {
+      height: 100%;
+      background: #3b82f6;
+      transition: width 0.3s;
+    }
+    
+    /* Уведомления */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
   </style>
 </head>
 <body class="bg-gray-50">
+  
+  <!-- Уведомления -->
+  <div id="notificationContainer"></div>
   
   <!-- Форма входа -->
   <div id="loginForm" class="min-h-screen flex items-center justify-center p-4">
@@ -77,18 +115,28 @@
                   class="px-6 py-3 font-semibold text-gray-600 hover:text-gray-800">
             Все питомцы
           </button>
+          <button onclick="showTab('stats')" id="tabStats"
+                  class="px-6 py-3 font-semibold text-gray-600 hover:text-gray-800">
+            Статистика
+          </button>
+          <button onclick="showTab('callbacks')" id="tabCallbacks"
+                  class="px-6 py-3 font-semibold text-gray-600 hover:text-gray-800">
+            Заявки
+          </button>
         </div>
       </div>
       
-      <!-- Форма добавления -->
+      <!-- Форма добавления/редактирования -->
       <div id="addTab" class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-xl font-bold mb-6">Добавить нового питомца</h2>
+        <h2 id="formTitle" class="text-xl font-bold mb-6">Добавить нового питомца</h2>
         
         <form id="petForm" onsubmit="savePet(event)">
+          <input type="hidden" id="editingPetId" value="">
+          
           <!-- Загрузка медиа -->
           <div class="mb-6">
             <label class="block text-sm font-semibold text-gray-700 mb-2">
-              Фото и видео (до 5 файлов)
+              Фото и видео (до 10 файлов)
             </label>
             <div id="dropZone" 
                  class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 transition"
@@ -100,7 +148,7 @@
                       d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
               </svg>
               <p class="text-gray-600 mb-2">Перетащите файлы сюда или нажмите для выбора</p>
-              <p class="text-sm text-gray-500">Поддерживаются: JPG, PNG, MP4 (до 50 МБ)</p>
+              <p class="text-sm text-gray-500">Поддерживаются: JPG, PNG, MP4 (фото будут автоматически оптимизированы)</p>
               <input type="file" id="fileInput" multiple accept="image/*,video/*" 
                      class="hidden" onchange="handleFileSelect(event)">
             </div>
@@ -111,6 +159,13 @@
           
           <!-- Основная информация -->
           <div class="grid md:grid-cols-2 gap-4 mb-6">
+            <!-- Имя питомца (новое) -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Имя питомца</label>
+              <input type="text" id="petName" placeholder="Например: Чарли" 
+                     class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">Тип животного</label>
               <select id="petType" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
@@ -122,8 +177,16 @@
             
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">Порода</label>
-              <input type="text" id="breed" placeholder="Например: Йоркширский терьер" 
-                     class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
+              <select id="breed" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                <option value="">Выберите породу</option>
+                <option value="Poodle">Poodle (Пудель)</option>
+                <option value="Maltipoo">Maltipoo (Мальтипу)</option>
+                <option value="Yorkshire Terrier">Yorkshire Terrier (Йоркширский терьер)</option>
+                <option value="Maltese">Maltese (Мальтезе)</option>
+                <option value="Toy Poodle">Toy Poodle (Той-пудель)</option>
+                <option value="Bichon Frise">Bichon Frise (Бишон фризе)</option>
+                <option value="Other">Другая порода</option>
+              </select>
             </div>
             
             <div>
@@ -157,11 +220,40 @@
             </div>
           </div>
           
-          <!-- Кнопка сохранения -->
-          <button type="submit" 
-                  class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
-            Добавить питомца
-          </button>
+          <!-- Описание (новое) -->
+          <div class="mb-6">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Описание</label>
+            <textarea id="description" rows="4" placeholder="Расскажите о характере, особенностях питомца..."
+                      class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+          </div>
+          
+          <!-- Дополнительная информация -->
+          <div class="grid md:grid-cols-2 gap-4 mb-6">
+            <!-- Прививки (новое) -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Прививки</label>
+              <textarea id="vaccinations" rows="3" placeholder="Список прививок и дата последней вакцинации"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+            
+            <!-- Родители (новое) -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Информация о родителях</label>
+              <textarea id="parents" rows="3" placeholder="Информация о маме и папе"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+          </div>
+          
+          <!-- Кнопки -->
+          <div class="flex gap-4">
+            <button type="submit" id="submitBtn"
+                    class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
+              Добавить питомца
+            </button>
+            <button type="button" onclick="cancelEdit()" id="cancelBtn" class="hidden px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-semibold">
+              Отмена
+            </button>
+          </div>
         </form>
       </div>
       
@@ -174,6 +266,26 @@
           </div>
         </div>
       </div>
+      
+      <!-- Статистика -->
+      <div id="statsTab" class="hidden">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-xl font-bold mb-6">Статистика просмотров</h2>
+          <div id="statsContent" class="space-y-4">
+            <!-- Здесь будет статистика -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- Заявки на обратный звонок -->
+      <div id="callbacksTab" class="hidden">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-xl font-bold mb-6">Заявки на обратный звонок</h2>
+          <div id="callbacksContent" class="space-y-4">
+            <!-- Здесь будут заявки -->
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   
@@ -182,8 +294,8 @@
     // Импорт Firebase
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getDatabase, ref, push, set, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+    import { getDatabase, ref, push, set, get, onValue, remove, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
     
     // Ваша конфигурация Firebase
     const firebaseConfig = {
@@ -212,9 +324,12 @@
     window.storageRef = storageRef;
     window.uploadBytes = uploadBytes;
     window.getDownloadURL = getDownloadURL;
+    window.deleteObject = deleteObject;
     window.dbRef = ref;
     window.dbPush = push;
     window.dbSet = set;
+    window.dbGet = get;
+    window.dbUpdate = update;
     window.dbOnValue = onValue;
     window.dbRemove = remove;
     
@@ -236,6 +351,8 @@
   
   <script>
     let uploadedFiles = [];
+    let existingMedia = [];
+    let currentEditingId = null;
     
     // Функция входа
     async function login() {
@@ -262,23 +379,57 @@
       }
     }
     
+    // Уведомления
+    function showNotification(message, type = 'success') {
+      const container = document.getElementById('notificationContainer');
+      const notification = document.createElement('div');
+      notification.className = `notification bg-${type === 'success' ? 'green' : 'red'}-500 text-white px-6 py-4 rounded-lg shadow-lg`;
+      notification.textContent = message;
+      container.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+    
     // Переключение табов
     function showTab(tab) {
+      // Скрываем все табы
+      document.getElementById('addTab').classList.add('hidden');
+      document.getElementById('listTab').classList.add('hidden');
+      document.getElementById('statsTab').classList.add('hidden');
+      document.getElementById('callbacksTab').classList.add('hidden');
+      
+      // Убираем активные классы
+      document.getElementById('tabAdd').classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+      document.getElementById('tabList').classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+      document.getElementById('tabStats').classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+      document.getElementById('tabCallbacks').classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+      document.getElementById('tabAdd').classList.add('text-gray-600');
+      document.getElementById('tabList').classList.add('text-gray-600');
+      document.getElementById('tabStats').classList.add('text-gray-600');
+      document.getElementById('tabCallbacks').classList.add('text-gray-600');
+      
+      // Показываем выбранный таб
       if (tab === 'add') {
         document.getElementById('addTab').classList.remove('hidden');
-        document.getElementById('listTab').classList.add('hidden');
         document.getElementById('tabAdd').classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
         document.getElementById('tabAdd').classList.remove('text-gray-600');
-        document.getElementById('tabList').classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
-        document.getElementById('tabList').classList.add('text-gray-600');
-      } else {
-        document.getElementById('addTab').classList.add('hidden');
+      } else if (tab === 'list') {
         document.getElementById('listTab').classList.remove('hidden');
         document.getElementById('tabList').classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
         document.getElementById('tabList').classList.remove('text-gray-600');
-        document.getElementById('tabAdd').classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
-        document.getElementById('tabAdd').classList.add('text-gray-600');
         loadPets();
+      } else if (tab === 'stats') {
+        document.getElementById('statsTab').classList.remove('hidden');
+        document.getElementById('tabStats').classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+        document.getElementById('tabStats').classList.remove('text-gray-600');
+        loadStats();
+      } else if (tab === 'callbacks') {
+        document.getElementById('callbacksTab').classList.remove('hidden');
+        document.getElementById('tabCallbacks').classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+        document.getElementById('tabCallbacks').classList.remove('text-gray-600');
+        loadCallbacks();
       }
     }
     
@@ -304,72 +455,164 @@
       handleFiles(e.target.files);
     }
     
-    function handleFiles(files) {
-      const maxFiles = 5;
-      const maxSize = 50 * 1024 * 1024; // 50MB
+    // Сжатие изображения
+    async function compressImage(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Максимальные размеры
+            const maxWidth = 1200;
+            const maxHeight = 1200;
+            let width = img.width;
+            let height = img.height;
+            
+            // Рассчитываем новые размеры
+            if (width > height) {
+              if (width > maxWidth) {
+                height *= maxWidth / width;
+                width = maxWidth;
+              }
+            } else {
+              if (height > maxHeight) {
+                width *= maxHeight / height;
+                height = maxHeight;
+              }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Рисуем изображение
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Конвертируем в blob
+            canvas.toBlob((blob) => {
+              resolve(new File([blob], file.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now()
+              }));
+            }, 'image/jpeg', 0.85); // Качество 85%
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    
+    async function handleFiles(files) {
+      const maxFiles = 10;
       
-      if (uploadedFiles.length + files.length > maxFiles) {
+      if (uploadedFiles.length + existingMedia.length + files.length > maxFiles) {
         alert(`Можно загрузить максимум ${maxFiles} файлов`);
         return;
       }
       
-      Array.from(files).forEach(file => {
-        if (file.size > maxSize) {
-          alert(`Файл ${file.name} слишком большой. Максимум 50 МБ.`);
-          return;
-        }
-        
+      for (let file of Array.from(files)) {
         if (!file.type.match(/^(image|video)\//)) {
           alert(`Файл ${file.name} не является изображением или видео`);
-          return;
+          continue;
+        }
+        
+        // Сжимаем изображения
+        if (file.type.startsWith('image/')) {
+          showNotification('Оптимизация изображения...', 'info');
+          file = await compressImage(file);
         }
         
         uploadedFiles.push(file);
-        displayPreview(file);
-      });
+        displayPreview(file, uploadedFiles.length - 1, true);
+      }
     }
     
-    function displayPreview(file) {
-      const reader = new FileReader();
+    function displayPreview(file, index, isNew = true) {
       const preview = document.getElementById('mediaPreview');
       
-      reader.onload = (e) => {
-        const div = document.createElement('div');
-        div.className = 'preview-item relative';
-        
-        if (file.type.startsWith('image/')) {
+      const div = document.createElement('div');
+      div.className = 'preview-item relative';
+      div.dataset.index = index;
+      div.dataset.isNew = isNew;
+      
+      if (isNew && file.type) {
+        // Новый файл
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (file.type.startsWith('image/')) {
+            div.innerHTML = `
+              <img src="${e.target.result}" alt="Preview">
+              <button onclick="removeFile(${index}, ${isNew})" 
+                      class="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full hover:bg-red-600">
+                ✕
+              </button>
+              <div class="upload-progress hidden">
+                <div class="upload-progress-bar" style="width: 0%"></div>
+              </div>
+            `;
+          } else {
+            div.innerHTML = `
+              <video src="${e.target.result}" controls></video>
+              <button onclick="removeFile(${index}, ${isNew})" 
+                      class="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full hover:bg-red-600">
+                ✕
+              </button>
+              <div class="upload-progress hidden">
+                <div class="upload-progress-bar" style="width: 0%"></div>
+              </div>
+            `;
+          }
+          preview.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // Существующий файл из базы
+        const mediaType = file.type === 'video' ? 'video' : 'image';
+        if (mediaType === 'image') {
           div.innerHTML = `
-            <img src="${e.target.result}" alt="Preview">
-            <button onclick="removeFile(${uploadedFiles.length - 1})" 
+            <img src="${file.url}" alt="Preview">
+            <button onclick="removeFile(${index}, ${isNew})" 
                     class="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full hover:bg-red-600">
               ✕
             </button>
           `;
         } else {
           div.innerHTML = `
-            <video src="${e.target.result}" controls></video>
-            <button onclick="removeFile(${uploadedFiles.length - 1})" 
+            <video src="${file.url}" controls></video>
+            <button onclick="removeFile(${index}, ${isNew})" 
                     class="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full hover:bg-red-600">
               ✕
             </button>
           `;
         }
-        
         preview.appendChild(div);
-      };
-      
-      reader.readAsDataURL(file);
+      }
     }
     
-    function removeFile(index) {
-      uploadedFiles.splice(index, 1);
+    function removeFile(index, isNew) {
+      if (isNew) {
+        uploadedFiles.splice(index, 1);
+      } else {
+        existingMedia.splice(index, 1);
+      }
       updatePreview();
     }
     
     function updatePreview() {
       const preview = document.getElementById('mediaPreview');
       preview.innerHTML = '';
-      uploadedFiles.forEach(file => displayPreview(file));
+      
+      // Показываем существующие медиа
+      existingMedia.forEach((media, index) => {
+        displayPreview(media, index, false);
+      });
+      
+      // Показываем новые файлы
+      uploadedFiles.forEach((file, index) => {
+        displayPreview(file, index, true);
+      });
     }
     
     // Сохранение питомца
@@ -382,35 +625,54 @@
         return;
       }
       
-      if (uploadedFiles.length === 0) {
+      const editingId = document.getElementById('editingPetId').value;
+      const isEditing = !!editingId;
+      
+      if (!isEditing && uploadedFiles.length === 0 && existingMedia.length === 0) {
         alert('Пожалуйста, загрузите хотя бы одно фото или видео');
         return;
       }
       
       const petData = {
+        name: document.getElementById('petName').value || '',
         type: document.getElementById('petType').value,
         breed: document.getElementById('breed').value,
         gender: document.getElementById('gender').value,
         age: parseInt(document.getElementById('age').value),
         price: parseInt(document.getElementById('price').value),
         status: document.getElementById('status').value,
-        createdAt: Date.now(),
-        createdBy: window.auth.currentUser.email,
-        media: []
+        description: document.getElementById('description').value || '',
+        vaccinations: document.getElementById('vaccinations').value || '',
+        parents: document.getElementById('parents').value || '',
+        updatedAt: Date.now(),
+        updatedBy: window.auth.currentUser.email,
+        media: [...existingMedia]
       };
       
+      if (!isEditing) {
+        petData.createdAt = Date.now();
+        petData.createdBy = window.auth.currentUser.email;
+        petData.views = 0;
+      }
+      
       // Показываем индикатор загрузки
-      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const submitBtn = document.getElementById('submitBtn');
       const originalText = submitBtn.textContent;
-      submitBtn.textContent = 'Загрузка...';
+      submitBtn.textContent = 'Сохранение...';
       submitBtn.disabled = true;
       
       try {
-        // Загружаем файлы в Firebase Storage
+        // Загружаем новые файлы в Firebase Storage
         for (let i = 0; i < uploadedFiles.length; i++) {
           const file = uploadedFiles[i];
-          const fileName = `pets/${Date.now()}_${file.name}`;
+          const fileName = `pets/${Date.now()}_${i}_${file.name}`;
           const fileRef = window.storageRef(window.storage, fileName);
+          
+          // Показываем прогресс
+          const progressElements = document.querySelectorAll('.preview-item[data-is-new="true"] .upload-progress');
+          if (progressElements[i]) {
+            progressElements[i].classList.remove('hidden');
+          }
           
           const snapshot = await window.uploadBytes(fileRef, file);
           const downloadURL = await window.getDownloadURL(snapshot.ref);
@@ -420,23 +682,31 @@
             type: file.type.startsWith('video/') ? 'video' : 'image'
           });
           
-          submitBtn.textContent = `Загрузка... ${i + 1}/${uploadedFiles.length}`;
+          // Обновляем прогресс
+          if (progressElements[i]) {
+            progressElements[i].querySelector('.upload-progress-bar').style.width = '100%';
+          }
+          
+          submitBtn.textContent = `Загрузка файлов... ${i + 1}/${uploadedFiles.length}`;
         }
         
         // Сохраняем данные в базу
-        const petsRef = window.dbRef(window.database, 'pets');
-        await window.dbPush(petsRef, petData);
+        if (isEditing) {
+          const petRef = window.dbRef(window.database, `pets/${editingId}`);
+          await window.dbUpdate(petRef, petData);
+          showNotification('Питомец успешно обновлен!');
+        } else {
+          const petsRef = window.dbRef(window.database, 'pets');
+          await window.dbPush(petsRef, petData);
+          showNotification('Питомец успешно добавлен!');
+        }
         
         // Очищаем форму
-        document.getElementById('petForm').reset();
-        uploadedFiles = [];
-        document.getElementById('mediaPreview').innerHTML = '';
-        
-        alert('Питомец успешно добавлен!');
+        cancelEdit();
         
       } catch (error) {
         console.error('Ошибка при сохранении:', error);
-        alert('Произошла ошибка: ' + error.message);
+        showNotification('Произошла ошибка: ' + error.message, 'error');
       } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
@@ -491,7 +761,10 @@
         ${mediaHtml}
         <div class="p-4">
           <div class="flex justify-between items-start mb-2">
-            <h3 class="font-semibold text-lg">${pet.breed}</h3>
+            <div>
+              <h3 class="font-semibold text-lg">${pet.name || pet.breed}</h3>
+              <p class="text-sm text-gray-500">${pet.breed}</p>
+            </div>
             <span class="text-xs px-2 py-1 rounded-full ${statusColors[pet.status]}">
               ${statusTexts[pet.status]}
             </span>
@@ -500,6 +773,7 @@
             ${pet.gender === 'male' ? '♂ Мальчик' : '♀ Девочка'}, ${pet.age} мес.
           </p>
           <p class="text-lg font-bold text-blue-600 mb-3">${pet.price.toLocaleString()} ₴</p>
+          ${pet.views !== undefined ? `<p class="text-xs text-gray-500 mb-2">👁 Просмотров: ${pet.views || 0}</p>` : ''}
           <div class="flex gap-2">
             <button onclick="editPet('${id}')" 
                     class="flex-1 bg-blue-100 text-blue-700 py-2 rounded hover:bg-blue-200 transition text-sm">
@@ -516,22 +790,311 @@
       return div;
     }
     
+    // Редактирование питомца
+    window.editPet = async function(id) {
+      currentEditingId = id;
+      
+      // Загружаем данные питомца
+      const petRef = window.dbRef(window.database, `pets/${id}`);
+      const snapshot = await window.dbGet(petRef);
+      
+      if (!snapshot.exists()) {
+        showNotification('Питомец не найден', 'error');
+        return;
+      }
+      
+      const pet = snapshot.val();
+      
+      // Переключаемся на вкладку добавления
+      showTab('add');
+      
+      // Меняем заголовок и кнопку
+      document.getElementById('formTitle').textContent = 'Редактировать питомца';
+      document.getElementById('submitBtn').textContent = 'Сохранить изменения';
+      document.getElementById('cancelBtn').classList.remove('hidden');
+      document.getElementById('editingPetId').value = id;
+      
+      // Заполняем форму
+      document.getElementById('petName').value = pet.name || '';
+      document.getElementById('petType').value = pet.type;
+      document.getElementById('breed').value = pet.breed;
+      document.getElementById('gender').value = pet.gender;
+      document.getElementById('age').value = pet.age;
+      document.getElementById('price').value = pet.price;
+      document.getElementById('status').value = pet.status;
+      document.getElementById('description').value = pet.description || '';
+      document.getElementById('vaccinations').value = pet.vaccinations || '';
+      document.getElementById('parents').value = pet.parents || '';
+      
+      // Загружаем существующие медиа
+      existingMedia = pet.media || [];
+      uploadedFiles = [];
+      updatePreview();
+    }
+    
+    // Отмена редактирования
+    window.cancelEdit = function() {
+      document.getElementById('petForm').reset();
+      document.getElementById('formTitle').textContent = 'Добавить нового питомца';
+      document.getElementById('submitBtn').textContent = 'Добавить питомца';
+      document.getElementById('cancelBtn').classList.add('hidden');
+      document.getElementById('editingPetId').value = '';
+      uploadedFiles = [];
+      existingMedia = [];
+      currentEditingId = null;
+      document.getElementById('mediaPreview').innerHTML = '';
+    }
+    
     // Удаление питомца
-    window.deletePet = function(id) {
+    window.deletePet = async function(id) {
       if (!window.auth.currentUser) {
         alert('Необходимо авторизоваться');
         return;
       }
       
-      if (confirm('Вы уверены, что хотите удалить этого питомца?')) {
-        const petRef = window.dbRef(window.database, `pets/${id}`);
-        window.dbRemove(petRef);
+      if (confirm('Вы уверены, что хотите удалить этого питомца? Это действие нельзя отменить.')) {
+        try {
+          // Получаем данные питомца для удаления медиа
+          const petRef = window.dbRef(window.database, `pets/${id}`);
+          const snapshot = await window.dbGet(petRef);
+          
+          if (snapshot.exists()) {
+            const pet = snapshot.val();
+            
+            // Удаляем медиа файлы из Storage
+            if (pet.media && pet.media.length > 0) {
+              for (const media of pet.media) {
+                try {
+                  // Извлекаем путь к файлу из URL
+                  const url = new URL(media.url);
+                  const path = decodeURIComponent(url.pathname.split('/o/')[1].split('?')[0]);
+                  const fileRef = window.storageRef(window.storage, path);
+                  await window.deleteObject(fileRef);
+                } catch (err) {
+                  console.error('Ошибка удаления файла:', err);
+                }
+              }
+            }
+          }
+          
+          // Удаляем запись из базы данных
+          await window.dbRemove(petRef);
+          showNotification('Питомец успешно удален');
+        } catch (error) {
+          console.error('Ошибка удаления:', error);
+          showNotification('Ошибка при удалении питомца', 'error');
+        }
       }
     }
     
-    // Редактирование питомца (заглушка)
-    window.editPet = function(id) {
-      alert('Функция редактирования будет добавлена в следующей версии');
+    // Загрузка статистики
+    window.loadStats = function() {
+      const petsRef = window.dbRef(window.database, 'pets');
+      window.dbOnValue(petsRef, (snapshot) => {
+        const statsContent = document.getElementById('statsContent');
+        statsContent.innerHTML = '';
+        
+        const pets = snapshot.val();
+        if (!pets) {
+          statsContent.innerHTML = '<p class="text-gray-500 text-center">Нет данных для отображения</p>';
+          return;
+        }
+        
+        // Сортируем по просмотрам
+        const petsArray = Object.entries(pets).map(([id, pet]) => ({
+          id,
+          ...pet,
+          views: pet.views || 0
+        }));
+        
+        petsArray.sort((a, b) => b.views - a.views);
+        
+        // Создаем таблицу статистики
+        const table = document.createElement('div');
+        table.className = 'overflow-x-auto';
+        table.innerHTML = `
+          <table class="min-w-full bg-white">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Питомец</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Порода</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Статус</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Просмотры</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              ${petsArray.map(pet => `
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap">${pet.name || 'Без имени'}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">${pet.breed}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                      ${pet.status === 'available' ? 'bg-green-100 text-green-800' : 
+                        pet.status === 'reserved' ? 'bg-yellow-100 text-yellow-800' : 
+                        'bg-gray-100 text-gray-800'}">
+                      ${pet.status === 'available' ? 'Доступен' : 
+                        pet.status === 'reserved' ? 'Забронирован' : 'Продан'}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <div class="flex items-center">
+                      <span class="mr-2">👁</span>
+                      <span class="font-medium">${pet.views}</span>
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        
+        statsContent.appendChild(table);
+        
+        // Добавляем общую статистику
+        const totalViews = petsArray.reduce((sum, pet) => sum + pet.views, 0);
+        const avgViews = Math.round(totalViews / petsArray.length);
+        
+        const summary = document.createElement('div');
+        summary.className = 'mt-6 grid grid-cols-3 gap-4';
+        summary.innerHTML = `
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600">Всего питомцев</p>
+            <p class="text-2xl font-bold text-blue-600">${petsArray.length}</p>
+          </div>
+          <div class="bg-green-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600">Общее количество просмотров</p>
+            <p class="text-2xl font-bold text-green-600">${totalViews}</p>
+          </div>
+          <div class="bg-purple-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600">Среднее количество просмотров</p>
+            <p class="text-2xl font-bold text-purple-600">${avgViews}</p>
+          </div>
+        `;
+        
+        statsContent.appendChild(summary);
+      });
+    }
+    
+    // Загрузка заявок на обратный звонок
+    window.loadCallbacks = function() {
+      const callbacksRef = window.dbRef(window.database, 'callbacks');
+      window.dbOnValue(callbacksRef, (snapshot) => {
+        const callbacksContent = document.getElementById('callbacksContent');
+        callbacksContent.innerHTML = '';
+        
+        const callbacks = snapshot.val();
+        if (!callbacks) {
+          callbacksContent.innerHTML = '<p class="text-gray-500 text-center">Нет заявок</p>';
+          return;
+        }
+        
+        // Преобразуем в массив и сортируем по дате (новые первые)
+        const callbacksArray = Object.entries(callbacks).map(([id, callback]) => ({
+          id,
+          ...callback
+        }));
+        
+        callbacksArray.sort((a, b) => b.createdAt - a.createdAt);
+        
+        // Создаем таблицу заявок
+        const table = document.createElement('div');
+        table.className = 'overflow-x-auto';
+        table.innerHTML = `
+          <table class="min-w-full bg-white">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Имя</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Телефон</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Статус</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Действия</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              ${callbacksArray.map(callback => {
+                const date = new Date(callback.createdAt).toLocaleString('ru-RU');
+                const statusColors = {
+                  new: 'bg-yellow-100 text-yellow-800',
+                  processed: 'bg-green-100 text-green-800',
+                  cancelled: 'bg-red-100 text-red-800'
+                };
+                const statusTexts = {
+                  new: 'Новая',
+                  processed: 'Обработана',
+                  cancelled: 'Отменена'
+                };
+                const status = callback.status || 'new';
+                
+                return `
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">${callback.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <a href="tel:${callback.phone}" class="text-blue-600 hover:underline">${callback.phone}</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${date}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[status]}">
+                        ${statusTexts[status]}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                      ${status === 'new' ? `
+                        <button onclick="markCallbackAsProcessed('${callback.id}')" 
+                                class="text-green-600 hover:text-green-900 mr-3">
+                          ✓ Обработана
+                        </button>
+                        <button onclick="markCallbackAsCancelled('${callback.id}')" 
+                                class="text-red-600 hover:text-red-900">
+                          ✗ Отменить
+                        </button>
+                      ` : ''}
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        `;
+        
+        callbacksContent.appendChild(table);
+        
+        // Добавляем сводную статистику
+        const newCount = callbacksArray.filter(c => c.status === 'new' || !c.status).length;
+        const processedCount = callbacksArray.filter(c => c.status === 'processed').length;
+        
+        const summary = document.createElement('div');
+        summary.className = 'mt-6 grid grid-cols-3 gap-4';
+        summary.innerHTML = `
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600">Всего заявок</p>
+            <p class="text-2xl font-bold text-blue-600">${callbacksArray.length}</p>
+          </div>
+          <div class="bg-yellow-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600">Новых заявок</p>
+            <p class="text-2xl font-bold text-yellow-600">${newCount}</p>
+          </div>
+          <div class="bg-green-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600">Обработано</p>
+            <p class="text-2xl font-bold text-green-600">${processedCount}</p>
+          </div>
+        `;
+        
+        callbacksContent.appendChild(summary);
+      });
+    }
+    
+    // Отметить заявку как обработанную
+    window.markCallbackAsProcessed = async function(id) {
+      const callbackRef = window.dbRef(window.database, `callbacks/${id}`);
+      await window.dbUpdate(callbackRef, { status: 'processed' });
+      showNotification('Заявка отмечена как обработанная');
+    }
+    
+    // Отметить заявку как отмененную
+    window.markCallbackAsCancelled = async function(id) {
+      const callbackRef = window.dbRef(window.database, `callbacks/${id}`);
+      await window.dbUpdate(callbackRef, { status: 'cancelled' });
+      showNotification('Заявка отменена');
     }
   </script>
 </body>

@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Milana Pet HOUSE - Питомник домашних животных</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Preconnect для ускорения загрузки внешних ресурсов -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://firebasestorage.googleapis.com">
+  
   <style>
     /* Фоновый паттерн для десктопа */
     @media (min-width: 1280px) {
@@ -73,9 +80,77 @@
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
       transform: translateY(-4px);
     }
+    
+    /* Плавающая кнопка обратного звонка */
+    .callback-button {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 999;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+    }
+    
+    .callback-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+    }
+    
+    /* Уведомления */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1001;
+      min-width: 300px;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    /* Стили для формы обратного звонка */
+    .phone-input {
+      font-size: 18px;
+      letter-spacing: 0.5px;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
+  
+  <!-- Контейнер для уведомлений -->
+  <div id="notificationContainer"></div>
+  
+  <!-- Плавающая кнопка обратного звонка -->
+  <div class="callback-button" onclick="openCallbackModal()">
+    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+    </svg>
+  </div>
   
   <!-- Основной контейнер с ограничением ширины -->
   <div class="max-w-7xl mx-auto bg-white shadow-xl">
@@ -140,7 +215,7 @@
           <!-- Слайд 1 - Доставка -->
           <div class="swiper-slide relative">
             <div class="video-container">
-              <video autoplay loop muted playsinline>
+              <video autoplay loop muted playsinline preload="metadata">
                 <source src="videos/slide2.mp4" type="video/mp4">
               </video>
               <div class="video-overlay">
@@ -158,7 +233,7 @@
           <!-- Слайд 2 - Уход -->
           <div class="swiper-slide relative">
             <div class="video-container">
-              <video autoplay loop muted playsinline>
+              <video loop muted playsinline preload="none">
                 <source src="videos/slide3.mp4" type="video/mp4">
               </video>
               <div class="video-overlay">
@@ -176,7 +251,7 @@
           <!-- Слайд 3 - Покупка -->
           <div class="swiper-slide relative">
             <div class="video-container">
-              <video autoplay loop muted playsinline>
+              <video loop muted playsinline preload="none">
                 <source src="videos/slide4.mp4" type="video/mp4">
               </video>
               <div class="video-overlay">
@@ -194,7 +269,7 @@
           <!-- Слайд 4 - Счастливые семьи -->
           <div class="swiper-slide relative">
             <div class="video-container">
-              <video autoplay loop muted playsinline>
+              <video loop muted playsinline preload="none">
                 <source src="videos/slide5.mp4" type="video/mp4">
               </video>
               <div class="video-overlay">
@@ -359,6 +434,27 @@
       </div>
     </section>
     
+    <!-- Форма обратной связи в футере -->
+    <section class="bg-gradient-to-r from-purple-600 to-blue-600 py-12 px-4 md:px-8">
+      <div class="container mx-auto max-w-4xl text-center">
+        <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">Остались вопросы?</h2>
+        <p class="text-white/90 mb-8">Оставьте свой номер телефона и мы перезвоним вам в течение 15 минут</p>
+        
+        <form id="footerCallbackForm" class="max-w-md mx-auto">
+          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+            <input type="text" id="footerName" placeholder="Ваше имя" required
+                   class="w-full px-4 py-3 bg-white rounded-lg focus:ring-2 focus:ring-white focus:outline-none mb-4">
+            <input type="tel" id="footerPhone" placeholder="+38 (0__) ___-__-__" required
+                   class="w-full px-4 py-3 bg-white rounded-lg focus:ring-2 focus:ring-white focus:outline-none mb-4 phone-input">
+            <button type="submit" 
+                    class="w-full bg-white text-purple-600 py-3 rounded-lg hover:bg-gray-100 transition font-semibold">
+              Перезвоните мне
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+    
     <!-- Футер -->
     <footer class="bg-slate-800 text-white py-12 px-4 md:px-8">
       <div class="container mx-auto">
@@ -454,14 +550,58 @@
     </div>
   </div>
   
+  <!-- Модальное окно обратного звонка -->
+  <div id="callbackModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-8 relative">
+      <button onclick="closeCallbackModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+      
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold text-slate-800">Заказать звонок</h3>
+        <p class="text-slate-600 mt-2">Мы перезвоним вам в течение 15 минут</p>
+      </div>
+      
+      <form id="callbackForm">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Ваше имя</label>
+            <input type="text" id="callbackName" required
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                   placeholder="Например: Александр">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Номер телефона</label>
+            <input type="tel" id="callbackPhone" required
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent phone-input"
+                   placeholder="+38 (0__) ___-__-__">
+          </div>
+          
+          <button type="submit" id="submitCallbackBtn"
+                  class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-lg hover:from-purple-700 hover:to-blue-700 transition font-semibold">
+            Отправить
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
   <!-- Scripts -->
   <script type="module">
     // Firebase конфигурация
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-    import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+    import { getDatabase, ref, onValue, push, set } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
     
     const firebaseConfig = {
-      apiKey: "AIzaSyAKcZ7Oi0DDpTweaM5aPDuY0MU97UAcYFk",
+      apiKey: "AIzaSyAKcZ78l0bDpTweaM5aPDUY0HU97UAcYFk",
       authDomain: "mph-com-ua.firebaseapp.com",
       databaseURL: "https://mph-com-ua-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "mph-com-ua",
@@ -473,6 +613,113 @@
     // Инициализация Firebase
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
+    
+    // Telegram Bot конфигурация
+    const TELEGRAM_BOT_TOKEN = '8069311812:AAEMNQumUbIz3vbGiW7mGgqomlXSWGIGcno';
+    const TELEGRAM_CHAT_ID = '6358511299';
+    
+    // Функция отправки в Telegram
+    async function sendToTelegram(name, phone) {
+      const message = `🔔 Новая заявка на обратный звонок!\n\n👤 Имя: ${name}\n📱 Телефон: ${phone}\n🕒 Время: ${new Date().toLocaleString('ru-RU')}`;
+      
+      try {
+        // Используем прокси для обхода CORS
+        const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+        const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        
+        const response = await fetch(proxyUrl + telegramUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: message,
+            parse_mode: 'HTML'
+          })
+        });
+        
+        if (!response.ok) {
+          console.error('Ошибка отправки в Telegram:', response.status);
+          // Если прокси не работает, просто сохраняем в базу
+          console.log('Заявка сохранена в базе данных');
+        } else {
+          console.log('Уведомление отправлено в Telegram');
+        }
+      } catch (error) {
+        console.error('Ошибка при отправке в Telegram:', error);
+        // Продолжаем работу даже если Telegram недоступен
+        console.log('Заявка сохранена в базе данных');
+      }
+    }
+    
+    // Функция сохранения заявки
+    async function saveCallback(name, phone) {
+      try {
+        const callbacksRef = ref(database, 'callbacks');
+        await push(callbacksRef, {
+          name: name,
+          phone: phone,
+          createdAt: Date.now(),
+          status: 'new'
+        });
+        
+        // Отправляем в Telegram
+        if (TELEGRAM_BOT_TOKEN !== 'YOUR_BOT_TOKEN') {
+          await sendToTelegram(name, phone);
+        }
+        
+        return true;
+      } catch (error) {
+        console.error('Ошибка сохранения:', error);
+        return false;
+      }
+    }
+    
+    // Обработчик формы в модальном окне
+    document.getElementById('callbackForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('callbackName').value;
+      const phone = document.getElementById('callbackPhone').value;
+      const submitBtn = document.getElementById('submitCallbackBtn');
+      
+      // Блокируем кнопку
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Отправка...';
+      
+      const success = await saveCallback(name, phone);
+      
+      if (success) {
+        showNotification('Спасибо! Мы перезвоним вам в течение 15 минут', 'success');
+        document.getElementById('callbackForm').reset();
+        setTimeout(() => closeCallbackModal(), 2000);
+      } else {
+        showNotification('Произошла ошибка. Попробуйте еще раз', 'error');
+      }
+      
+      // Разблокируем кнопку
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Отправить';
+    });
+    
+    // Обработчик формы в футере
+    document.getElementById('footerCallbackForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('footerName').value;
+      const phone = document.getElementById('footerPhone').value;
+      
+      const success = await saveCallback(name, phone);
+      
+      if (success) {
+        showNotification('Спасибо! Мы перезвоним вам в течение 15 минут', 'success');
+        document.getElementById('footerCallbackForm').reset();
+      } else {
+        showNotification('Произошла ошибка. Попробуйте еще раз', 'error');
+      }
+    });
     
     // Загрузка питомцев
     function loadPets() {
@@ -518,21 +765,30 @@
         return;
       }
       
+      // Создаем фрагмент для лучшей производительности
+      const fragment = document.createDocumentFragment();
+      
       // Берем первого питомца для большой карточки
       const featuredPet = pets[0];
       const featuredCard = createFeaturedPetCard(featuredPet);
-      petsGrid.appendChild(featuredCard);
+      fragment.appendChild(featuredCard);
       
       // Берем следующие 5 питомцев для маленьких карточек
       const smallPets = pets.slice(1, 6);
       smallPets.forEach(pet => {
         const card = createSmallPetCard(pet);
-        petsGrid.appendChild(card);
+        fragment.appendChild(card);
       });
       
       // Добавляем кнопку "Показать всех"
       const showAllCard = createShowAllCard(pets.length);
-      petsGrid.appendChild(showAllCard);
+      fragment.appendChild(showAllCard);
+      
+      // Добавляем все карточки одним действием
+      petsGrid.appendChild(fragment);
+      
+      // Инициализируем lazy loading для новых изображений
+      initLazyLoading();
     }
     
     function createFeaturedPetCard(pet) {
@@ -552,14 +808,15 @@
       
       div.innerHTML = `
         <div class="bg-white rounded-2xl overflow-hidden card-shadow h-full">
-          <div class="aspect-video bg-gray-200">
-            <img src="${imageUrl}" alt="${pet.breed}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='/images/pet-placeholder.jpg'">
+          <div class="aspect-video bg-gray-200 relative">
+            <div class="skeleton absolute inset-0"></div>
+            <img data-src="${imageUrl}" alt="${pet.breed}" class="w-full h-full object-cover lazy-image" loading="lazy">
           </div>
           <div class="p-6">
             <span class="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full mb-3">
               Новинка
             </span>
-            <h3 class="text-2xl font-bold text-slate-800 mb-2">${pet.breed || 'Порода не указана'}</h3>
+            <h3 class="text-2xl font-bold text-slate-800 mb-2">${pet.name || pet.breed || 'Порода не указана'}</h3>
             <div class="flex items-center space-x-4 text-slate-600 mb-4">
               <span>${pet.gender === 'male' ? '♂ Мальчик' : '♀ Девочка'}</span>
               <span>${pet.age} ${getAgeText(pet.age)}</span>
@@ -588,11 +845,12 @@
       console.log('Small pet image:', imageUrl);
       
       div.innerHTML = `
-        <div class="aspect-square bg-gray-200">
-          <img src="${imageUrl}" alt="${pet.breed}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='/images/pet-placeholder.jpg'">
+        <div class="aspect-square bg-gray-200 relative">
+          <div class="skeleton absolute inset-0"></div>
+          <img data-src="${imageUrl}" alt="${pet.breed}" class="w-full h-full object-cover lazy-image" loading="lazy">
         </div>
         <div class="p-4">
-          <h4 class="font-semibold text-slate-800">${pet.breed || 'Порода не указана'}</h4>
+          <h4 class="font-semibold text-slate-800">${pet.name || pet.breed || 'Порода не указана'}</h4>
           <p class="text-sm text-slate-600">${pet.gender === 'male' ? '♂' : '♀'} ${pet.age} ${getAgeText(pet.age)}</p>
           <p class="text-lg font-bold text-blue-600 mt-2">${(pet.price || 0).toLocaleString()} ₴</p>
         </div>
@@ -635,6 +893,60 @@
     
     // Загружаем питомцев при загрузке страницы
     window.addEventListener('DOMContentLoaded', loadPets);
+    
+    // Lazy loading для изображений
+    function initLazyLoading() {
+      const images = document.querySelectorAll('img[data-src]');
+      
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            const skeleton = img.previousElementSibling;
+            
+            // Загружаем изображение
+            img.src = img.dataset.src;
+            img.onload = () => {
+              img.classList.add('loaded');
+              if (skeleton && skeleton.classList.contains('skeleton')) {
+                skeleton.style.display = 'none';
+              }
+            };
+            img.onerror = () => {
+              img.src = '/images/pet-placeholder.jpg';
+              img.classList.add('loaded');
+              if (skeleton && skeleton.classList.contains('skeleton')) {
+                skeleton.style.display = 'none';
+              }
+            };
+            
+            observer.unobserve(img);
+          }
+        });
+      }, {
+        rootMargin: '50px'
+      });
+      
+      images.forEach(img => imageObserver.observe(img));
+    }
+    
+    // Глобальные функции для уведомлений
+    window.showNotification = function(message, type = 'success') {
+      const container = document.getElementById('notificationContainer');
+      const notification = document.createElement('div');
+      notification.className = `notification bg-${type === 'success' ? 'green' : 'red'}-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center`;
+      
+      const icon = type === 'success' 
+        ? '<svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>'
+        : '<svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
+      
+      notification.innerHTML = icon + message;
+      container.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 4000);
+    }
   </script>
   
   <script>
@@ -656,11 +968,24 @@
       const dots = document.querySelectorAll('.pagination-dot');
       
       function showSlide(index) {
-        slides.forEach(slide => slide.style.display = 'none');
+        slides.forEach(slide => {
+          slide.style.display = 'none';
+          // Останавливаем видео в неактивных слайдах
+          const video = slide.querySelector('video');
+          if (video && index !== currentSlide) {
+            video.pause();
+          }
+        });
         dots.forEach(dot => dot.classList.remove('active'));
         
         slides[index].style.display = 'block';
         dots[index].classList.add('active');
+        
+        // Запускаем видео в активном слайде
+        const activeVideo = slides[index].querySelector('video');
+        if (activeVideo) {
+          activeVideo.play();
+        }
       }
       
       function nextSlide() {
@@ -680,7 +1005,7 @@
       setInterval(nextSlide, 5000);
     });
     
-    // Функции для модального окна
+    // Функции для модальных окон
     function openContactModal() {
       document.getElementById('contactModal').classList.remove('hidden');
       document.body.style.overflow = 'hidden';
@@ -688,6 +1013,16 @@
     
     function closeContactModal() {
       document.getElementById('contactModal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+    
+    function openCallbackModal() {
+      document.getElementById('callbackModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeCallbackModal() {
+      document.getElementById('callbackModal').classList.add('hidden');
       document.body.style.overflow = 'auto';
     }
     
@@ -709,6 +1044,45 @@
     const mobileLinks = mobileMenu.querySelectorAll('a');
     mobileLinks.forEach(link => {
       link.addEventListener('click', closeMobileMenu);
+    });
+    
+    // Форматирование телефона
+    document.querySelectorAll('.phone-input').forEach(input => {
+      input.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        let formattedValue = '';
+        
+        if (value.length > 0) {
+          if (value[0] === '3' && value[1] === '8') {
+            formattedValue = '+38';
+            if (value.length > 2) {
+              formattedValue += ' (' + value.substring(2, 5);
+              if (value.length > 5) {
+                formattedValue += ') ' + value.substring(5, 8);
+                if (value.length > 8) {
+                  formattedValue += '-' + value.substring(8, 10);
+                  if (value.length > 10) {
+                    formattedValue += '-' + value.substring(10, 12);
+                  }
+                }
+              }
+            }
+          } else {
+            formattedValue = '+38 (0' + value.substring(0, 2);
+            if (value.length > 2) {
+              formattedValue += ') ' + value.substring(2, 5);
+              if (value.length > 5) {
+                formattedValue += '-' + value.substring(5, 7);
+                if (value.length > 7) {
+                  formattedValue += '-' + value.substring(7, 9);
+                }
+              }
+            }
+          }
+        }
+        
+        e.target.value = formattedValue;
+      });
     });
   </script>
   
@@ -752,6 +1126,28 @@
       background: white;
       width: 30px;
       border-radius: 5px;
+    }
+    
+    /* Lazy loading для изображений */
+    .lazy-image {
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .lazy-image.loaded {
+      opacity: 1;
+    }
+    
+    /* Skeleton loader */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+    }
+    
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
   </style>
 </body>

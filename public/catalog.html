@@ -6,6 +6,88 @@
     <title>Наши питомцы - Milana Pet House</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Skeleton loader для изображений */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Плавное появление изображений */
+        .image-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .image-wrapper img {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        
+        .image-wrapper img.loading {
+            opacity: 0;
+            transform: scale(1.1);
+        }
+        
+        .image-wrapper img.loaded {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* Анимация появления карточек */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .pet-card {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .pet-card:nth-child(1) { animation-delay: 0.1s; }
+        .pet-card:nth-child(2) { animation-delay: 0.2s; }
+        .pet-card:nth-child(3) { animation-delay: 0.3s; }
+        .pet-card:nth-child(4) { animation-delay: 0.4s; }
+        .pet-card:nth-child(5) { animation-delay: 0.5s; }
+        .pet-card:nth-child(6) { animation-delay: 0.6s; }
+        
+        /* Эффект при наведении на карточку */
+        .pet-card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .pet-card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Пульсация для загрузки */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        /* Градиент для кнопок */
+        .gradient-purple {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
 </head>
 <body class="min-h-screen bg-gray-50">
     <!-- Навигация -->
@@ -13,8 +95,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <a href="/" class="flex items-center">
-                        <img src="/images/logo.png" alt="Milana Pet House" class="h-10 w-10 mr-3">
+                    <a href="/" class="flex items-center group">
+                        <img src="/images/logo.png" alt="Milana Pet House" class="h-10 w-10 mr-3 transition-transform group-hover:scale-110">
                         <span class="font-bold text-xl text-purple-600">Milana Pet House</span>
                     </a>
                 </div>
@@ -28,7 +110,7 @@
                 
                 <!-- Мобильное меню -->
                 <div class="md:hidden">
-                    <button id="mobileMenuBtn" class="text-gray-700">
+                    <button id="mobileMenuBtn" class="text-gray-700 hover:text-purple-600 transition">
                         <i class="fas fa-bars text-2xl"></i>
                     </button>
                 </div>
@@ -59,18 +141,24 @@
                     <!-- Поиск -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Поиск по породе</label>
-                        <input type="text" id="searchInput" placeholder="Например: Лабрадор" 
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <div class="relative">
+                            <input type="text" id="searchInput" placeholder="Например: Poodle" 
+                                   class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                            <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                        </div>
                     </div>
                     
                     <!-- Тип питомца -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Тип питомца</label>
-                        <select id="typeFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                            <option value="all">Все питомцы</option>
-                            <option value="dog">Собаки</option>
-                            <option value="cat">Кошки</option>
-                        </select>
+                        <div class="relative">
+                            <select id="typeFilter" class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 appearance-none cursor-pointer">
+                                <option value="all">Все питомцы</option>
+                                <option value="dog">🐕 Собаки</option>
+                                <option value="cat">🐱 Кошки</option>
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                        </div>
                     </div>
                     
                     <!-- Диапазон цен -->
@@ -86,7 +174,7 @@
                     
                     <!-- Кнопка сброса -->
                     <div class="flex items-end">
-                        <button id="resetFilters" class="w-full bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                        <button id="resetFilters" class="w-full bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-all transform hover:scale-105">
                             <i class="fas fa-undo mr-2"></i>Сбросить
                         </button>
                     </div>
@@ -104,7 +192,9 @@
 
         <!-- Сообщение, если нет питомцев -->
         <div id="emptyMessage" class="hidden text-center py-12">
-            <i class="fas fa-paw text-6xl text-gray-300 mb-4"></i>
+            <div class="animate-bounce">
+                <i class="fas fa-paw text-6xl text-gray-300 mb-4"></i>
+            </div>
             <p class="text-xl text-gray-500">Питомцы не найдены</p>
             <p class="text-gray-400 mt-2">Попробуйте изменить параметры поиска</p>
         </div>
@@ -125,11 +215,11 @@
     <!-- Firebase -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+        import { getDatabase, ref, onValue, update, increment } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
 
         // Конфигурация Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyAKcZ7Oi0DDpTweaM5aPDuY0MU97UAcYFk",
+            apiKey: "AIzaSyAKcZ78l0bDpTweaM5aPDUY0HU97UAcYFk",
             authDomain: "mph-com-ua.firebaseapp.com",
             databaseURL: "https://mph-com-ua-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "mph-com-ua",
@@ -156,6 +246,28 @@
         const maxPriceInput = document.getElementById('maxPrice');
         const resetButton = document.getElementById('resetFilters');
 
+        // Lazy loading для изображений
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.onload = () => {
+                        img.classList.remove('loading');
+                        img.classList.add('loaded');
+                        // Убираем skeleton loader
+                        const skeleton = img.previousElementSibling;
+                        if (skeleton && skeleton.classList.contains('skeleton')) {
+                            skeleton.style.display = 'none';
+                        }
+                    };
+                    observer.unobserve(img);
+                }
+            });
+        }, {
+            rootMargin: '50px'
+        });
+
         // Загрузка питомцев из Firebase
         function loadPets() {
             console.log('Начинаем загрузку питомцев...');
@@ -175,7 +287,6 @@
                         });
                     }
                     console.log('Загружено питомцев:', allPets.length);
-                    console.log('Данные питомцев:', allPets);
                 } else {
                     console.log('В базе данных нет питомцев');
                 }
@@ -204,16 +315,16 @@
             petsGrid.classList.remove('hidden');
             emptyMessage.classList.add('hidden');
             
-            pets.forEach(pet => {
-                const card = createPetCard(pet);
+            pets.forEach((pet, index) => {
+                const card = createPetCard(pet, index);
                 petsGrid.appendChild(card);
             });
         }
 
-        // Создание карточки питомца
-        function createPetCard(pet) {
+        // Создание карточки питомца с анимациями
+        function createPetCard(pet, index) {
             const card = document.createElement('div');
-            card.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer';
+            card.className = 'pet-card pet-card-hover bg-white rounded-lg shadow-md overflow-hidden cursor-pointer';
             
             // Берем первое фото или заглушку
             let imageUrl = '/images/pet-placeholder.jpg';
@@ -229,11 +340,17 @@
             const genderIcon = pet.gender === 'male' ? 'mars' : 'venus';
             
             card.innerHTML = `
-                <div class="relative h-64 overflow-hidden">
-                    <img src="${imageUrl}" alt="${pet.breed}" 
-                         class="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                <div class="relative h-64 overflow-hidden image-wrapper">
+                    <!-- Skeleton loader -->
+                    <div class="skeleton absolute inset-0 z-10"></div>
+                    
+                    <!-- Изображение с lazy loading -->
+                    <img data-src="${imageUrl}" alt="${pet.breed}" 
+                         class="w-full h-full object-cover loading"
                          onerror="this.src='/images/pet-placeholder.jpg'">
-                    <div class="absolute top-4 right-4 bg-white px-3 py-1 rounded-full shadow-md">
+                    
+                    <!-- Бейдж типа питомца -->
+                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full shadow-md transform transition-transform hover:scale-110">
                         <span class="text-sm font-semibold text-purple-600">
                             ${pet.type === 'dog' ? '🐕 Собака' : '🐱 Кошка'}
                         </span>
@@ -241,7 +358,7 @@
                 </div>
                 
                 <div class="p-6">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">${pet.breed}</h3>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">${pet.name || pet.breed}</h3>
                     
                     <div class="space-y-2 mb-4">
                         <p class="text-gray-600 flex items-center">
@@ -252,19 +369,39 @@
                             <i class="fas fa-birthday-cake mr-2 text-purple-500"></i>
                             ${pet.age} ${getAgeWord(pet.age)}
                         </p>
-                        <p class="text-2xl font-bold text-purple-600">
+                        <p class="text-2xl font-bold gradient-purple bg-clip-text text-transparent">
                             ${pet.price.toLocaleString('ru-RU')} ₴
                         </p>
                     </div>
                     
-                    <button onclick="window.location.href='/pet-details.html?id=${pet.id}'" 
-                            class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition font-semibold">
+                    <button onclick="goToPetDetails('${pet.id}')" 
+                            class="w-full gradient-purple text-white py-3 rounded-lg hover:shadow-lg transition-all transform hover:scale-105 font-semibold">
                         Подробнее
                     </button>
                 </div>
             `;
             
+            // Наблюдаем за изображением для lazy loading
+            const img = card.querySelector('img');
+            imageObserver.observe(img);
+            
             return card;
+        }
+
+        // Функция перехода на страницу деталей с учетом просмотров
+        window.goToPetDetails = async function(petId) {
+            // Увеличиваем счетчик просмотров
+            try {
+                const petRef = ref(database, `pets/${petId}/views`);
+                await update(ref(database, `pets/${petId}`), {
+                    views: increment(1)
+                });
+            } catch (error) {
+                console.error('Ошибка обновления просмотров:', error);
+            }
+            
+            // Переходим на страницу
+            window.location.href = `/pet-details.html?id=${petId}`;
         }
 
         // Склонение слова "месяц"
@@ -282,8 +419,11 @@
             const maxPrice = parseFloat(maxPriceInput.value) || Infinity;
             
             filteredPets = allPets.filter(pet => {
-                // Поиск по породе
-                if (searchTerm && !pet.breed.toLowerCase().includes(searchTerm)) {
+                // Поиск по породе и имени
+                const searchInBreed = pet.breed && pet.breed.toLowerCase().includes(searchTerm);
+                const searchInName = pet.name && pet.name.toLowerCase().includes(searchTerm);
+                
+                if (searchTerm && !searchInBreed && !searchInName) {
                     return false;
                 }
                 
@@ -303,8 +443,18 @@
             displayPets(filteredPets);
         }
 
-        // Сброс фильтров
+        // Сброс фильтров с анимацией
         function resetFilters() {
+            // Анимация вращения кнопки
+            const icon = resetButton.querySelector('i');
+            icon.style.transform = 'rotate(360deg)';
+            icon.style.transition = 'transform 0.5s';
+            
+            setTimeout(() => {
+                icon.style.transform = 'rotate(0deg)';
+            }, 500);
+            
+            // Сброс значений
             searchInput.value = '';
             typeFilter.value = 'all';
             minPriceInput.value = '';
@@ -312,8 +462,13 @@
             applyFilters();
         }
 
-        // Обработчики событий
-        searchInput.addEventListener('input', applyFilters);
+        // Обработчики событий с debounce для поиска
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyFilters, 300);
+        });
+        
         typeFilter.addEventListener('change', applyFilters);
         minPriceInput.addEventListener('input', applyFilters);
         maxPriceInput.addEventListener('input', applyFilters);
