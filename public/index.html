@@ -922,7 +922,7 @@
       }
     });
     
-    // Загрузка питомцев
+// Загрузка питомцев
     function loadPets() {
       const petsRef = ref(database, 'pets');
       onValue(petsRef, (snapshot) => {
@@ -999,9 +999,63 @@
       // Проверяем наличие изображений
       let imageUrl = '/images/pet-placeholder.jpg';
       
-      if (pet.media && pet.media.length > 0 && pet.media[0].url) {
-        imageUrl = pet.media[0].url;
-      } else if (pet.images && pet.images.length > 0) {
+      // Новый формат - ищем первое изображение
+      if (pet.media && pet.media.length > 0) {
+        for (let item of pet.media) {
+          if (item.type === 'image' && item.url) {
+            imageUrl = item.url;
+            break;
+          }
+        }
+      }
+      // Старый формат
+      else if (pet.images && pet.images.length > 0) {
+        imageUrl = pet.images[0];
+      }
+      
+      console.log('Featured pet image:', imageUrl);
+      
+      div.innerHTML = `
+        <div class="bg-white rounded-2xl overflow-hidden card-shadow h-full">
+          <div class="aspect-video bg-gray-200 relative">
+            <div class="skeleton absolute inset-0"></div>
+            <img data-src="${imageUrl}" alt="${pet.breed}" class="w-full h-full object-cover lazy-image" loading="lazy">
+          </div>
+          <div class="p-6">
+            <span class="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full mb-3">
+              Новинка
+            </span>
+            <h3 class="text-2xl font-bold text-slate-800 mb-2">${pet.name || pet.breed || 'Порода не указана'}</h3>
+            <div class="flex items-center space-x-4 text-slate-600 mb-4">
+              <span>${pet.gender === 'male' ? '♂ Мальчик' : '♀ Девочка'}</span>
+              <span>${pet.age} ${getAgeText(pet.age)}</span>
+            </div>
+            <p class="text-3xl font-bold text-blue-600">${(pet.price || 0).toLocaleString()} ₴</p>
+          </div>
+        </div>
+      `;
+      
+      return div;
+    }
+    
+    function createSmallPetCard(pet) {
+      const div = document.createElement('div');
+      div.className = 'bg-white rounded-xl overflow-hidden card-shadow';
+      
+      // Проверяем наличие изображений
+      let imageUrl = '/images/pet-placeholder.jpg';
+      
+      // Новый формат - ищем первое изображение
+      if (pet.media && pet.media.length > 0) {
+        for (let item of pet.media) {
+          if (item.type === 'image' && item.url) {
+            imageUrl = item.url;
+            break;
+          }
+        }
+      }
+      // Старый формат
+      else if (pet.images && pet.images.length > 0) {
         imageUrl = pet.images[0];
       }
       

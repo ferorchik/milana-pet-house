@@ -66,6 +66,40 @@
       transform: scale(1);
     }
     
+    /* Стили для видео в карточках */
+    .image-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background-color: #000;
+    }
+    
+    /* Кастомизация контролов видео */
+    .image-wrapper video::-webkit-media-controls-panel {
+      background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.5));
+    }
+    
+    /* Hover эффект для карточек с видео */
+    .pet-card:hover video {
+      filter: brightness(0.9);
+    }
+    
+    /* Анимация для индикатора видео */
+    @keyframes playPulse {
+      0%, 100% { 
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% { 
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
+    
+    .fa-play {
+      animation: playPulse 2s ease-in-out infinite;
+    }
+    
     /* Анимация появления карточек */
     @keyframes fadeInUp {
       from {
@@ -319,6 +353,47 @@
             rootMargin: '50px'
         });
 
+        // Функция для создания медиа-элемента (изображение или видео)
+        function createMediaElement(pet) {
+            let mediaHtml = '';
+            let mediaUrl = '/images/pet-placeholder.jpg';
+            let isVideo = false;
+            
+            // Проверяем наличие медиафайлов
+            if (pet.media && pet.media.length > 0 && pet.media[0].url) {
+                mediaUrl = pet.media[0].url;
+                isVideo = pet.media[0].type === 'video';
+            } else if (pet.images && pet.images.length > 0) {
+                mediaUrl = pet.images[0];
+            }
+            
+            if (isVideo) {
+                // Для видео создаем video элемент
+                mediaHtml = `
+                    <video class="w-full h-full object-cover" 
+                           controls 
+                           muted 
+                           preload="metadata"
+                           poster="${mediaUrl.replace('.mp4', '_poster.jpg')}"
+                           onerror="this.poster='/images/pet-placeholder.jpg'">
+                        <source src="${mediaUrl}" type="video/mp4">
+                        Ваш браузер не поддерживает видео.
+                    </video>
+                `;
+            } else {
+                // Для изображений используем img с lazy loading
+                mediaHtml = `
+                    <div class="skeleton absolute inset-0 z-10"></div>
+                    <img data-src="${mediaUrl}" 
+                         alt="${pet.breed}" 
+                         class="w-full h-full object-cover loading"
+                         onerror="this.src='/images/pet-placeholder.jpg'">
+                `;
+            }
+            
+            return { mediaHtml, isVideo };
+        }
+
         // Загрузка питомцев из Firebase
         function loadPets() {
             console.log('Начинаем загрузку питомцев...');
@@ -377,14 +452,7 @@
             const card = document.createElement('div');
             card.className = 'pet-card pet-card-hover bg-white rounded-lg shadow-md overflow-hidden cursor-pointer';
             
-            // Берем первое фото или заглушку
-            let imageUrl = '/images/pet-placeholder.jpg';
-            
-            if (pet.media && pet.media.length > 0 && pet.media[0].url) {
-                imageUrl = pet.media[0].url;
-            } else if (pet.images && pet.images.length > 0) {
-                imageUrl = pet.images[0];
-            }
+            const { mediaHtml, isVideo } = createMediaElement(pet);
             
             // Определяем пол для отображения
             const genderText = pet.gender === 'male' ? 'Мальчик' : 'Девочка';
@@ -392,13 +460,7 @@
             
             card.innerHTML = `
                 <div class="relative h-64 overflow-hidden image-wrapper">
-                    <!-- Skeleton loader -->
-                    <div class="skeleton absolute inset-0 z-10"></div>
-                    
-                    <!-- Изображение с lazy loading -->
-                    <img data-src="${imageUrl}" alt="${pet.breed}" 
-                         class="w-full h-full object-cover loading"
-                         onerror="this.src='/images/pet-placeholder.jpg'">
+                    ${mediaHtml}
                     
                     <!-- Бейдж типа питомца -->
                     <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full shadow-md transform transition-transform hover:scale-110">
@@ -406,6 +468,13 @@
                             ${pet.type === 'dog' ? '🐕 Собака' : '🐱 Кошка'}
                         </span>
                     </div>
+                    
+                    ${isVideo ? `
+                    <!-- Индикатор видео -->
+                    <div class="absolute top-4 left-4 bg-black/70 backdrop-blur px-2 py-1 rounded-full">
+                        <i class="fas fa-play text-white text-xs"></i>
+                    </div>
+                    ` : ''}
                 </div>
                 
                 <div class="p-6">
@@ -432,9 +501,13 @@
                 </div>
             `;
             
-            // Наблюдаем за изображением для lazy loading
-            const img = card.querySelector('img');
-            imageObserver.observe(img);
+            // Если это не видео, наблюдаем за изображением для lazy loading
+            if (!isVideo) {
+                const img = card.querySelector('img');
+                if (img) {
+                    imageObserver.observe(img);
+                }
+            }
             
             return card;
         }
