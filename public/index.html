@@ -4,13 +4,61 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Milana Pet HOUSE - Питомник домашних животных</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Питомник Milana Pet House в Киеве ⭐ Продажа породистых щенков и котят: Мальтипу, Той-пудель, Кокер-спаниель ✓ С документами ✓ Доставка по Украине">
+  <meta name="keywords" content="питомник киев, купить щенка, купить котенка, мальтипу украина, той пудель купить, milana pet house">
+  
+  <!-- Open Graph Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Milana Pet HOUSE - Питомник домашних животных в Киеве">
+  <meta property="og:description" content="Питомник породистых щенков и котят. Мальтипу, Той-пудель, Кокер-спаниель. Доставка по всей Украине. 20+ лет опыта.">
+  <meta property="og:image" content="https://mph.com.ua/og-image.jpg">
+  <meta property="og:url" content="https://mph.com.ua/">
+  <meta property="og:site_name" content="Milana Pet HOUSE">
+  <meta property="og:locale" content="ru_RU">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Milana Pet HOUSE - Питомник домашних животных">
+  <meta name="twitter:description" content="Питомник породистых щенков и котят в Киеве. Доставка по всей Украине.">
+  <meta name="twitter:image" content="https://mph.com.ua/og-image.jpg">
+  
+  <!-- Canonical URL - ВАЖНО для главной страницы -->
+  <link rel="canonical" href="https://mph.com.ua/">
+  
+  <!-- Дополнительные мета-теги для лучшего SEO -->
+  <meta name="author" content="Milana Pet House">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="googlebot" content="index, follow">
+  
+  <!-- Гео-таргетинг -->
+  <meta name="geo.region" content="UA-30" />
+  <meta name="geo.placename" content="Киев" />
+  <meta name="geo.position" content="50.4501;30.5234" />
+  <meta name="ICBM" content="50.4501, 30.5234" />
+  
+  <!-- Дополнительные улучшения для мобильных устройств -->
+  <meta name="theme-color" content="#667eea">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Milana Pet House">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/favicon.png">
   
   <!-- Preconnect для ускорения загрузки внешних ресурсов -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://www.gstatic.com">
   <link rel="preconnect" href="https://firebasestorage.googleapis.com">
+  
+  <!-- Preload для критических ресурсов -->
+  <link rel="preload" href="/logo.png" as="image">
+  <link rel="preload" href="/og-image.jpg" as="image">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
   
   <style>
     /* Фоновый паттерн для десктопа */
@@ -52,44 +100,44 @@
       object-fit: cover;
     }
     
-/* Оверлей для видео */
-.video-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.1) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  text-align: center;
-  opacity: 1; /* Изменено с 0 на 1 - теперь всегда видно */
-  transition: all 0.3s;
-}
+    /* Оверлей для видео */
+    .video-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.1) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      opacity: 1;
+      transition: all 0.3s;
+    }
 
-/* При наведении делаем фон темнее */
-.swiper-slide:hover .video-overlay {
-  background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 100%);
-}
+    /* При наведении делаем фон темнее */
+    .swiper-slide:hover .video-overlay {
+      background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 100%);
+    }
 
-/* Стили для текста с тенями для лучшей читаемости */
-.video-overlay h2 {
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-}
+    /* Стили для текста с тенями для лучшей читаемости */
+    .video-overlay h2 {
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
 
-.video-overlay p {
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
+    .video-overlay p {
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
 
-/* Кнопка всегда видна, но становится ярче при наведении */
-.video-overlay a {
-  opacity: 0.9;
-  transition: all 0.3s;
-}
+    /* Кнопка всегда видна, но становится ярче при наведении */
+    .video-overlay a {
+      opacity: 0.9;
+      transition: all 0.3s;
+    }
 
-.swiper-slide:hover .video-overlay a {
-  opacity: 1;
-  transform: scale(1.05);
-}
+    .swiper-slide:hover .video-overlay a {
+      opacity: 1;
+      transform: scale(1.05);
+    }
     
     /* Кастомная тень для карточек */
     .card-shadow {
@@ -159,6 +207,138 @@
       letter-spacing: 0.5px;
     }
   </style>
+  
+  <!-- Google Search Console verification -->
+  <meta name="google-site-verification" content="356_hB9Ngwz-zcKVHPJzVO6WGa8AQoxqKHEa7eX7Dcs" />
+  
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TVD7CXRCFP"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TVD7CXRCFP');
+  </script>
+  
+  <!-- LocalBusiness Schema.org разметка -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": "https://mph.com.ua/#organization",
+    "name": "Milana Pet House",
+    "alternateName": "Milana Pet HOUSE",
+    "description": "Питомник породистых щенков и котят в Киеве. Мальтипу, Той-пудель, Английский кокер-спаниель. Более 20 лет опыта, 500+ счастливых семей.",
+    "url": "https://mph.com.ua",
+    "telephone": "+380632618179",
+    "priceRange": "₴₴₴",
+    "image": [
+      "https://mph.com.ua/og-image.jpg",
+      "https://mph.com.ua/logo.png"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Киев",
+      "addressRegion": "Киевская область",
+      "addressCountry": "UA"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 50.4501,
+      "longitude": 30.5234
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday", "Tuesday", "Wednesday", "Thursday", 
+        "Friday", "Saturday", "Sunday"
+      ],
+      "opens": "06:00",
+      "closes": "00:00"
+    },
+    "sameAs": [
+      "https://www.instagram.com/milana_pet_house/",
+      "https://t.me/milana_pet_house"
+    ],
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Породистые щенки и котята",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Product",
+            "name": "Щенки Maltipoo",
+            "category": "Собаки"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Product",
+            "name": "Щенки Toy Poodle",
+            "category": "Собаки"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Product",
+            "name": "Щенки English Cocker Spaniel",
+            "category": "Собаки"
+          }
+        }
+      ]
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "Украина"
+    },
+    "slogan": "Питомник с любовью к каждому питомцу",
+    "foundingDate": "2019",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "500"
+    }
+  }
+  </script>
+  
+  <!-- WebSite Schema для поискового окна в Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "url": "https://mph.com.ua/",
+    "name": "Milana Pet House",
+    "description": "Официальный сайт питомника Milana Pet House",
+    "publisher": {
+      "@id": "https://mph.com.ua/#organization"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://mph.com.ua/catalog.html?search={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  
+  <!-- Breadcrumb Schema для главной страницы -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [{
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Главная",
+      "item": "https://mph.com.ua/"
+    }]
+  }
+  </script>
 </head>
 <body class="bg-gray-50">
   
@@ -353,49 +533,48 @@
     </section>
     
     <!-- Полезные ссылки -->
-   <!-- Полезные ссылки -->
-<section class="py-16 px-4 md:px-8 bg-gradient-to-b from-white to-gray-50">
-  <div class="container mx-auto">
-    <h2 class="text-3xl md:text-4xl font-bold text-center text-slate-800 mb-12">
-      Полезная информация
-    </h2>
-    
-    <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-      <!-- Уход за питомцами -->
-      <a href="/care.html" class="bg-white rounded-2xl p-8 text-center hover:shadow-xl transition group">
-        <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition">
-          <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-          </svg>
+    <section class="py-16 px-4 md:px-8 bg-gradient-to-b from-white to-gray-50">
+      <div class="container mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-slate-800 mb-12">
+          Полезная информация
+        </h2>
+        
+        <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <!-- Уход за питомцами -->
+          <a href="/care.html" class="bg-white rounded-2xl p-8 text-center hover:shadow-xl transition group">
+            <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition">
+              <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Уход за питомцами</h3>
+            <p class="text-slate-600">Всё о правильном уходе, кормлении и воспитании вашего нового друга</p>
+          </a>
+          
+          <!-- FAQ -->
+          <a href="/faq.html" class="bg-white rounded-2xl p-8 text-center hover:shadow-xl transition group">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition">
+              <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Часто задаваемые вопросы</h3>
+            <p class="text-slate-600">Ответы на популярные вопросы о покупке, доставке и содержании</p>
+          </a>
         </div>
-        <h3 class="text-xl font-bold text-slate-800 mb-2">Уход за питомцами</h3>
-        <p class="text-slate-600">Всё о правильном уходе, кормлении и воспитании вашего нового друга</p>
-      </a>
-      
-      <!-- FAQ -->
-      <a href="/faq.html" class="bg-white rounded-2xl p-8 text-center hover:shadow-xl transition group">
-        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition">
-          <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
+        
+        <!-- Дополнительный CTA блок -->
+        <div class="mt-12 text-center">
+          <div class="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-8 max-w-2xl mx-auto">
+            <h3 class="text-2xl font-bold text-white mb-4">Готовы выбрать питомца?</h3>
+            <p class="text-white/90 mb-6">Посмотрите всех доступных щенков и котят в нашем каталоге</p>
+            <a href="/catalog.html" class="inline-block bg-white text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition transform hover:scale-105">
+              Смотреть каталог
+            </a>
+          </div>
         </div>
-        <h3 class="text-xl font-bold text-slate-800 mb-2">Часто задаваемые вопросы</h3>
-        <p class="text-slate-600">Ответы на популярные вопросы о покупке, доставке и содержании</p>
-      </a>
-    </div>
-    
-    <!-- Дополнительный CTA блок -->
-    <div class="mt-12 text-center">
-      <div class="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-8 max-w-2xl mx-auto">
-        <h3 class="text-2xl font-bold text-white mb-4">Готовы выбрать питомца?</h3>
-        <p class="text-white/90 mb-6">Посмотрите всех доступных щенков и котят в нашем каталоге</p>
-        <a href="/catalog.html" class="inline-block bg-white text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition transform hover:scale-105">
-          Смотреть каталог
-        </a>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
     
     <!-- Доставка -->
     <section id="delivery" class="py-16 px-4 md:px-8 bg-slate-50">
@@ -826,44 +1005,6 @@
         imageUrl = pet.images[0];
       }
       
-      console.log('Featured pet image:', imageUrl);
-      
-      div.innerHTML = `
-        <div class="bg-white rounded-2xl overflow-hidden card-shadow h-full">
-          <div class="aspect-video bg-gray-200 relative">
-            <div class="skeleton absolute inset-0"></div>
-            <img data-src="${imageUrl}" alt="${pet.breed}" class="w-full h-full object-cover lazy-image" loading="lazy">
-          </div>
-          <div class="p-6">
-            <span class="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full mb-3">
-              Новинка
-            </span>
-            <h3 class="text-2xl font-bold text-slate-800 mb-2">${pet.name || pet.breed || 'Порода не указана'}</h3>
-            <div class="flex items-center space-x-4 text-slate-600 mb-4">
-              <span>${pet.gender === 'male' ? '♂ Мальчик' : '♀ Девочка'}</span>
-              <span>${pet.age} ${getAgeText(pet.age)}</span>
-            </div>
-            <p class="text-3xl font-bold text-blue-600">${(pet.price || 0).toLocaleString()} ₴</p>
-          </div>
-        </div>
-      `;
-      
-      return div;
-    }
-    
-    function createSmallPetCard(pet) {
-      const div = document.createElement('div');
-      div.className = 'bg-white rounded-xl overflow-hidden card-shadow';
-      
-      // Проверяем наличие изображений
-      let imageUrl = '/images/pet-placeholder.jpg';
-      
-      if (pet.media && pet.media.length > 0 && pet.media[0].url) {
-        imageUrl = pet.media[0].url;
-      } else if (pet.images && pet.images.length > 0) {
-        imageUrl = pet.images[0];
-      }
-      
       console.log('Small pet image:', imageUrl);
       
       div.innerHTML = `
@@ -1174,3 +1315,41 @@
   </style>
 </body>
 </html>
+        imageUrl = pet.images[0];
+      }
+      
+      console.log('Featured pet image:', imageUrl);
+      
+      div.innerHTML = `
+        <div class="bg-white rounded-2xl overflow-hidden card-shadow h-full">
+          <div class="aspect-video bg-gray-200 relative">
+            <div class="skeleton absolute inset-0"></div>
+            <img data-src="${imageUrl}" alt="${pet.breed}" class="w-full h-full object-cover lazy-image" loading="lazy">
+          </div>
+          <div class="p-6">
+            <span class="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full mb-3">
+              Новинка
+            </span>
+            <h3 class="text-2xl font-bold text-slate-800 mb-2">${pet.name || pet.breed || 'Порода не указана'}</h3>
+            <div class="flex items-center space-x-4 text-slate-600 mb-4">
+              <span>${pet.gender === 'male' ? '♂ Мальчик' : '♀ Девочка'}</span>
+              <span>${pet.age} ${getAgeText(pet.age)}</span>
+            </div>
+            <p class="text-3xl font-bold text-blue-600">${(pet.price || 0).toLocaleString()} ₴</p>
+          </div>
+        </div>
+      `;
+      
+      return div;
+    }
+    
+    function createSmallPetCard(pet) {
+      const div = document.createElement('div');
+      div.className = 'bg-white rounded-xl overflow-hidden card-shadow';
+      
+      // Проверяем наличие изображений
+      let imageUrl = '/images/pet-placeholder.jpg';
+      
+      if (pet.media && pet.media.length > 0 && pet.media[0].url) {
+        imageUrl = pet.media[0].url;
+      } else if (pet.images && pet.images.length > 0) {

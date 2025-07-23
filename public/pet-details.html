@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Детали питомца - Milana Pet House</title>
+    <!-- Заголовок будет обновлен динамически -->
+    <title>Информация о питомце - Milana Pet House</title>
     
     <!-- SEO Meta Tags (будут обновляться динамически) -->
     <meta name="description" content="Подробная информация о питомце. Купить щенка или котенка с документами в питомнике Milana Pet House">
     <meta name="keywords" content="купить щенка, купить котенка, питомник киев, породистые щенки, с документами">
     
-    <!-- Open Graph Tags -->
+    <!-- Open Graph Tags (будут обновляться динамически) -->
     <meta property="og:type" content="product">
     <meta property="og:title" content="Информация о питомце | Milana Pet House">
     <meta property="og:description" content="Породистый питомец с документами. Доставка по всей Украине.">
@@ -18,19 +19,19 @@
     <meta property="og:site_name" content="Milana Pet House">
     <meta property="og:locale" content="ru_RU">
     
-    <!-- Twitter Card -->
+    <!-- Twitter Card (будет обновляться динамически) -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Информация о питомце | Milana Pet House">
     <meta name="twitter:description" content="Породистый питомец с документами. Доставка по всей Украине.">
     <meta name="twitter:image" content="https://mph.com.ua/og-image.jpg">
     
-    <!-- Canonical URL -->
+    <!-- Canonical URL (будет обновляться динамически) -->
     <link rel="canonical" href="https://mph.com.ua/pet-details.html">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon.png">
     
-    <!-- Product Schema.org -->
+    <!-- Product Schema.org (будет обновляться динамически) -->
     <script type="application/ld+json" id="productSchema">
     {
       "@context": "https://schema.org",
@@ -52,6 +53,26 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Место для Google Analytics -->
+    <!-- Google tag (gtag.js) -->
+    <!-- 
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TVD7CXRCFP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-TVD7CXRCFP');
+</script>
 </head>
 <body class="min-h-screen bg-gray-50">
     <!-- Навигация (такая же как в каталоге) -->
@@ -60,7 +81,7 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
                     <a href="/" class="flex items-center">
-                        <img src="/images/logo.png" alt="Milana Pet House" class="h-10 w-10 mr-3">
+                        <img src="/logo.png" alt="Milana Pet House" class="h-10 w-10 mr-3">
                         <span class="font-bold text-xl text-purple-600">Milana Pet House</span>
                     </a>
                 </div>
@@ -69,7 +90,7 @@
                     <a href="/" class="text-gray-700 hover:text-purple-600 transition">Главная</a>
                     <a href="/catalog.html" class="text-gray-700 hover:text-purple-600 transition">Каталог</a>
                     <a href="/care.html" class="text-gray-700 hover:text-purple-600 transition">Уход</a>
-                    <a href="/reviews.html" class="text-gray-700 hover:text-purple-600 transition">Отзывы</a>
+                    <!-- <a href="/reviews.html" class="text-gray-700 hover:text-purple-600 transition">Отзывы</a> -->
                     <a href="/faq.html" class="text-gray-700 hover:text-purple-600 transition">FAQ</a>
                 </div>
                 
@@ -88,7 +109,7 @@
             <a href="/" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Главная</a>
             <a href="/catalog.html" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Каталог</a>
             <a href="/care.html" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Уход</a>
-            <a href="/reviews.html" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Отзывы</a>
+            <!-- <a href="/reviews.html" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">Отзывы</a> -->
             <a href="/faq.html" class="block text-gray-700 hover:text-purple-600 transition font-medium py-2">FAQ</a>
         </div>
     </div>
@@ -96,13 +117,26 @@
     <!-- Основной контент -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Хлебные крошки -->
-        <nav class="mb-6">
-            <ol class="flex items-center space-x-2 text-sm">
-                <li><a href="/" class="text-gray-500 hover:text-purple-600">Главная</a></li>
+        <nav class="mb-6" aria-label="Хлебные крошки">
+            <ol class="flex items-center space-x-2 text-sm" itemscope itemtype="https://schema.org/BreadcrumbList">
+                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                    <a href="/" itemprop="item" class="text-gray-500 hover:text-purple-600">
+                        <span itemprop="name">Главная</span>
+                    </a>
+                    <meta itemprop="position" content="1" />
+                </li>
                 <li><span class="text-gray-400">/</span></li>
-                <li><a href="/catalog.html" class="text-gray-500 hover:text-purple-600">Каталог</a></li>
+                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                    <a href="/catalog.html" itemprop="item" class="text-gray-500 hover:text-purple-600">
+                        <span itemprop="name">Каталог</span>
+                    </a>
+                    <meta itemprop="position" content="2" />
+                </li>
                 <li><span class="text-gray-400">/</span></li>
-                <li id="breadcrumbName" class="text-gray-700">Загрузка...</li>
+                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" id="breadcrumbItem">
+                    <span itemprop="name" id="breadcrumbName" class="text-gray-700">Загрузка...</span>
+                    <meta itemprop="position" content="3" />
+                </li>
             </ol>
         </nav>
 
@@ -246,7 +280,7 @@
 
         // Конфигурация Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyAKcZ7Oi0DDpTweaM5aPDuY0MU97UAcYFk",
+            apiKey: "AIzaSyAKcZ78l0bDpTweaM5aPDUY0HU97UAcYFk",
             authDomain: "mph-com-ua.firebaseapp.com",
             databaseURL: "https://mph-com-ua-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "mph-com-ua",
@@ -276,6 +310,7 @@
                 if (snapshot.exists()) {
                     const pet = snapshot.val();
                     displayPetDetails(pet);
+                    updateMetaTags(pet, id); // НОВАЯ функция для обновления мета-тегов
                 } else {
                     showError();
                 }
@@ -291,7 +326,7 @@
             document.getElementById('petContent').classList.remove('hidden');
             
             // Заполняем данные
-            document.getElementById('breadcrumbName').textContent = pet.breed;
+            document.getElementById('breadcrumbName').textContent = pet.name || pet.breed;
             document.getElementById('petBreed').textContent = pet.breed;
             document.getElementById('petType').textContent = pet.type === 'dog' ? '🐕 Собака' : '🐱 Кошка';
             document.getElementById('petGender').textContent = pet.gender === 'male' ? '♂ Мальчик' : '♀ Девочка';
@@ -325,9 +360,93 @@
                     thumbnailsContainer.appendChild(thumb);
                 });
             }
+        }
+
+        // НОВАЯ ФУНКЦИЯ: Динамическое обновление мета-тегов
+        function updateMetaTags(pet, petId) {
+            // Получаем URL текущей страницы
+            const currentUrl = `https://mph.com.ua/pet-details.html?id=${petId}`;
+            const petName = pet.name || pet.breed;
+            const petType = pet.type === 'dog' ? 'щенка' : 'котенка';
+            const price = pet.price.toLocaleString('ru-RU');
             
             // Обновляем заголовок страницы
-            document.title = `${pet.breed} - Milana Pet House`;
+            document.title = `${petName} - купить ${petType} в Киеве | Milana Pet House`;
+            
+            // Обновляем meta description
+            const metaDesc = document.querySelector('meta[name="description"]');
+            metaDesc.content = `${petName} - ${pet.breed}, ${pet.gender === 'male' ? 'мальчик' : 'девочка'}, ${pet.age} мес. Цена: ${price} грн. ✓ С документами ✓ Привит ✓ Доставка по Украине`;
+            
+            // Обновляем meta keywords
+            const metaKeywords = document.querySelector('meta[name="keywords"]');
+            metaKeywords.content = `купить ${petType} ${pet.breed}, ${pet.breed} Киев, ${pet.breed} цена, ${pet.breed} купить Украина, питомник Milana Pet House`;
+            
+            // Обновляем Open Graph теги
+            document.querySelector('meta[property="og:title"]').content = `${petName} - ${pet.breed} | Milana Pet House`;
+            document.querySelector('meta[property="og:description"]').content = `${pet.breed}, ${pet.gender === 'male' ? 'мальчик' : 'девочка'}, ${pet.age} мес. Цена: ${price} грн. Доставка по всей Украине.`;
+            document.querySelector('meta[property="og:url"]').content = currentUrl;
+            
+            // Обновляем изображение Open Graph
+            if (pet.media && pet.media.length > 0) {
+                const ogImage = typeof pet.media[0] === 'string' ? pet.media[0] : pet.media[0].url;
+                document.querySelector('meta[property="og:image"]').content = ogImage;
+                document.querySelector('meta[name="twitter:image"]').content = ogImage;
+            }
+            
+            // Обновляем Twitter Card
+            document.querySelector('meta[name="twitter:title"]').content = `${petName} - ${pet.breed} | Milana Pet House`;
+            document.querySelector('meta[name="twitter:description"]').content = `${pet.breed}, ${pet.gender === 'male' ? 'мальчик' : 'девочка'}, ${pet.age} мес. Цена: ${price} грн.`;
+            
+            // Обновляем canonical URL
+            document.querySelector('link[rel="canonical"]').href = currentUrl;
+            
+            // Обновляем Product Schema.org
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": "Product",
+                "name": `${petName} - ${pet.breed}`,
+                "description": pet.description || `${pet.breed}, ${pet.gender === 'male' ? 'мальчик' : 'девочка'}, возраст ${pet.age} месяцев. Породистый питомец с документами.`,
+                "image": pet.media && pet.media.length > 0 ? 
+                    (typeof pet.media[0] === 'string' ? pet.media[0] : pet.media[0].url) : 
+                    "https://mph.com.ua/og-image.jpg",
+                "brand": {
+                    "@type": "Brand",
+                    "name": "Milana Pet House"
+                },
+                "offers": {
+                    "@type": "Offer",
+                    "url": currentUrl,
+                    "priceCurrency": "UAH",
+                    "price": pet.price,
+                    "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    "availability": pet.status === 'available' ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+                    "seller": {
+                        "@type": "Organization",
+                        "name": "Milana Pet House"
+                    }
+                },
+                "additionalProperty": [
+                    {
+                        "@type": "PropertyValue",
+                        "name": "Пол",
+                        "value": pet.gender === 'male' ? 'Мальчик' : 'Девочка'
+                    },
+                    {
+                        "@type": "PropertyValue",
+                        "name": "Возраст",
+                        "value": `${pet.age} месяцев`
+                    },
+                    {
+                        "@type": "PropertyValue",
+                        "name": "Порода",
+                        "value": pet.breed
+                    }
+                ]
+            };
+            
+            // Заменяем старую Schema разметку
+            const schemaScript = document.getElementById('productSchema');
+            schemaScript.textContent = JSON.stringify(schema, null, 2);
         }
 
         function showError() {
